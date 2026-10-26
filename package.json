@@ -1,0 +1,23 @@
+{
+  "name": "festiva-ai",
+  "version": "1.0.0",
+  "description": "Festiva AI — The Smart Celebration & Event Planner",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "event-planner",
+    "gemini",
+    "genai",
+    "wedding-planner",
+    "celebration-planner",
+    "budget-planner"
+  ],
+  "author": "Festiva AI Team",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.22.3"
+  }
+}

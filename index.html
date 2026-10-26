@@ -1,0 +1,1332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Festiva AI — The Smart Celebration & Event Planner</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            ivory: {
+              50: '#FAF8F5',
+              100: '#F5EFEB',
+              200: '#E8E0D7',
+              300: '#D8CFC3'
+            },
+            coral: {
+              400: '#E8725C',
+              500: '#E06A55',
+              600: '#CC5743'
+            },
+            gold: {
+              400: '#D4AF37',
+              500: '#C5A059',
+              600: '#B08B42'
+            },
+            ink: {
+              900: '#1E152A',
+              800: '#2A1B3D',
+              700: '#4A3E56',
+              500: '#7A6F86'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Canvas Confetti for Celebration moments -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-ivory-50 text-ink-900 min-h-screen flex flex-col selection:bg-coral-500 selection:text-white">
+
+  <!-- ================= TOP NAVIGATION BAR ================= -->
+  <header class="glass-nav sticky top-0 z-40 transition-all duration-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      
+      <!-- Logo & Brand -->
+      <div class="flex items-center gap-3 cursor-pointer" onclick="App.navigateTo('landing')">
+        <div class="w-11 h-11 rounded-xl bg-gradient-to-tr from-ink-900 to-ink-800 text-gold-400 flex items-center justify-center shadow-md border border-gold-500/30">
+          <i data-lucide="sparkles" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-2xl font-serif-editorial font-bold tracking-tight text-ink-900">Festiva<span class="text-coral-500">.</span>ai</span>
+            <span class="text-[10px] uppercase font-bold tracking-widest px-2 py-0.5 rounded-full bg-gold-500/10 text-gold-600 border border-gold-500/20">GenAI</span>
+          </div>
+          <p class="text-xs text-ink-500 font-medium tracking-wide">The Smart Celebration Planner</p>
+        </div>
+      </div>
+
+      <!-- Center Nav Links (Visible when in Dashboard) -->
+      <nav id="topNavDashboardLinks" class="hidden md:flex items-center gap-1 bg-ivory-100/80 p-1.5 rounded-xl border border-ivory-200">
+        <button onclick="App.switchTab('overview')" class="tab-btn px-3 py-1.5 rounded-lg text-sm font-medium text-ink-700 hover:text-ink-900 transition-colors" data-tab="overview">Overview</button>
+        <button onclick="App.switchTab('plan')" class="tab-btn px-3 py-1.5 rounded-lg text-sm font-medium text-ink-700 hover:text-ink-900 transition-colors" data-tab="plan">Concepts</button>
+        <button onclick="App.switchTab('budget')" class="tab-btn px-3 py-1.5 rounded-lg text-sm font-medium text-ink-700 hover:text-ink-900 transition-colors" data-tab="budget">Budget</button>
+        <button onclick="App.switchTab('timeline')" class="tab-btn px-3 py-1.5 rounded-lg text-sm font-medium text-ink-700 hover:text-ink-900 transition-colors" data-tab="timeline">Timeline</button>
+        <button onclick="App.switchTab('vendors')" class="tab-btn px-3 py-1.5 rounded-lg text-sm font-medium text-ink-700 hover:text-ink-900 transition-colors" data-tab="vendors">Vendors</button>
+        <button onclick="App.switchTab('ideas')" class="tab-btn px-3 py-1.5 rounded-lg text-sm font-medium text-ink-700 hover:text-ink-900 transition-colors" data-tab="ideas">Ideas</button>
+        <button onclick="App.switchTab('guests')" class="tab-btn px-3 py-1.5 rounded-lg text-sm font-medium text-ink-700 hover:text-ink-900 transition-colors" data-tab="guests">Guests</button>
+      </nav>
+
+      <!-- Right Actions -->
+      <div class="flex items-center gap-3">
+        
+        <!-- AI Engine Status Pill -->
+        <button onclick="App.openAiModal()" id="aiStatusPill" class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200 hover:bg-emerald-100 transition-colors" title="Configure AI Engine settings & API key">
+          <span class="ai-pulse-dot"></span>
+          <span id="aiStatusLabel">Festiva Intelligence</span>
+          <i data-lucide="settings" class="w-3.5 h-3.5 text-emerald-600"></i>
+        </button>
+
+        <!-- Quick Switch Demo / New Event -->
+        <button onclick="App.openWizard()" class="btn-primary text-sm py-2 px-4 shadow-sm">
+          <i data-lucide="plus" class="w-4 h-4"></i>
+          <span class="hidden sm:inline">Plan Event</span>
+        </button>
+
+        <button onclick="App.loadDemoEvent()" class="btn-secondary text-sm py-2 px-3.5 hidden sm:inline-flex" title="Load Tuscan Wedding Demo">
+          <i data-lucide="play-circle" class="w-4 h-4 text-coral-500"></i>
+          <span>Demo</span>
+        </button>
+
+        <!-- Export / Print Menu -->
+        <button onclick="App.openExportModal()" class="p-2 rounded-lg text-ink-700 hover:text-ink-900 hover:bg-ivory-100 transition-colors" title="Export or Print Event Summary">
+          <i data-lucide="share-2" class="w-5 h-5"></i>
+        </button>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= MAIN CONTAINER ================= -->
+  <main class="flex-grow">
+    
+    <!-- SECTION 1: ELEGANT LANDING PAGE (VIEW) -->
+    <div id="landingView" class="py-12 md:py-20 transition-all duration-300">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <!-- Hero Header -->
+        <div class="text-center max-w-3xl mx-auto mb-14">
+          <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-gold-500/10 border border-gold-500/20 text-gold-700 text-xs font-semibold tracking-wider uppercase mb-6">
+            <i data-lucide="sparkles" class="w-3.5 h-3.5 text-gold-500"></i>
+            Intelligent Celebration Engineering
+          </div>
+          
+          <h1 class="text-4xl sm:text-5xl lg:text-6xl font-serif-editorial font-bold text-ink-900 tracking-tight leading-[1.15] mb-6">
+            Your Vision. Your Celebration. <br class="hidden sm:inline" />
+            <span class="italic font-garamond text-coral-500">Perfectlys</span> Planned.
+          </h1>
+          
+          <p class="text-lg sm:text-xl text-ink-700 font-normal leading-relaxed max-w-2xl mx-auto mb-9">
+            From the first idea to the final celebration, your AI event planner turns your vision, guest list, and budget into a plan you can actually execute.
+          </p>
+
+          <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <button onclick="App.openWizard()" class="btn-primary text-base py-3.5 px-8 w-full sm:w-auto text-center shadow-lg">
+              <i data-lucide="calendar-plus" class="w-5 h-5"></i>
+              Plan My Event
+            </button>
+            <button onclick="App.loadDemoEvent()" class="btn-secondary text-base py-3.5 px-8 w-full sm:w-auto text-center">
+              <i data-lucide="compass" class="w-5 h-5 text-coral-500"></i>
+              Explore Demo
+            </button>
+          </div>
+
+          <p class="text-xs text-ink-500 mt-4 flex items-center justify-center gap-1.5">
+            <i data-lucide="check-circle" class="w-3.5 h-3.5 text-sage-accent"></i>
+            No account required. Instant AI-generated budget, timeline & concept studio.
+          </p>
+        </div>
+
+        <!-- Interactive Preview Teaser Card -->
+        <div class="festiva-card p-6 md:p-8 mb-20 bg-gradient-to-b from-white to-ivory-50/70 border border-ivory-200">
+          <div class="flex flex-col lg:flex-row items-center justify-between gap-8">
+            <div class="space-y-4 max-w-lg">
+              <div class="flex items-center gap-2">
+                <span class="px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider bg-coral-50 text-coral-600 border border-coral-200">Featured Demo</span>
+                <span class="text-xs text-ink-500 font-medium">110 Guests • $45,000 Budget</span>
+              </div>
+              <h3 class="text-2xl font-serif-editorial font-bold text-ink-900">Sophia & Liam's Tuscan Vineyard Wedding</h3>
+              <p class="text-sm text-ink-700 leading-relaxed">
+                Experience an end-to-end celebration architecture featuring 3 tailored aesthetic concepts, mathematical budget breakdown with contingency guardrails, and real-time Celebration Confidence scoring.
+              </p>
+              
+              <!-- Color swatch preview -->
+              <div class="flex items-center gap-2 pt-1">
+                <span class="text-xs text-ink-500 font-semibold mr-1">Concept Palette:</span>
+                <span class="swatch-chip bg-[#2C3E2D]" title="Olive Leaf"></span>
+                <span class="swatch-chip bg-[#C5A059]" title="Champagne Gold"></span>
+                <span class="swatch-chip bg-[#FAF7F2]" title="Warm Alabaster"></span>
+                <span class="swatch-chip bg-[#D48C70]" title="Terracotta Rose"></span>
+                <span class="swatch-chip bg-[#4A2E35]" title="Deep Chianti"></span>
+              </div>
+            </div>
+
+            <!-- Score gauge snippet -->
+            <div class="flex items-center gap-6 bg-white p-5 rounded-2xl border border-ivory-200 shadow-sm">
+              <div class="text-center">
+                <div class="text-3xl font-serif-editorial font-bold text-emerald-700">86<span class="text-lg text-emerald-600">/100</span></div>
+                <div class="text-[11px] uppercase tracking-wider font-bold text-ink-500 mt-0.5">Readiness Score</div>
+                <div class="text-xs font-semibold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-full mt-2 border border-emerald-200">Peak Readiness</div>
+              </div>
+              <div class="h-16 w-px bg-ivory-200"></div>
+              <div class="space-y-2 text-xs">
+                <div class="flex justify-between gap-4"><span class="text-ink-500">Tasks Completed:</span><span class="font-bold text-ink-900">11 / 18 (61%)</span></div>
+                <div class="flex justify-between gap-4"><span class="text-ink-500">Vendors Locked:</span><span class="font-bold text-ink-900">8 of 8 Booked</span></div>
+                <div class="flex justify-between gap-4"><span class="text-ink-500">Budget Health:</span><span class="font-bold text-emerald-600">Within Target</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- "Why Festiva AI?" - Three Genuine Advantages -->
+        <div class="mb-20">
+          <div class="text-center max-w-xl mx-auto mb-12">
+            <h2 class="text-3xl font-serif-editorial font-bold text-ink-900 mb-3">Why Festiva AI?</h2>
+            <p class="text-sm text-ink-500">Built for discerning hosts who want genuine execution clarity rather than generic moodboards.</p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            
+            <!-- Pillar 1 -->
+            <div class="festiva-card p-7 bg-white relative overflow-hidden group">
+              <div class="w-12 h-12 rounded-xl bg-coral-50 text-coral-500 flex items-center justify-center mb-5 border border-coral-200/50 group-hover:scale-110 transition-transform">
+                <i data-lucide="map" class="w-6 h-6"></i>
+              </div>
+              <h3 class="text-xl font-serif-editorial font-bold text-ink-900 mb-2">Plan Smarter</h3>
+              <p class="text-sm text-ink-700 leading-relaxed">
+                Convert a spark of an idea into an actionable, chronologically sound event roadmap with automated milestone deadlines adapted to your real celebration date.
+              </p>
+            </div>
+
+            <!-- Pillar 2 -->
+            <div class="festiva-card p-7 bg-white relative overflow-hidden group">
+              <div class="w-12 h-12 rounded-xl bg-gold-50 text-gold-600 flex items-center justify-center mb-5 border border-gold-200/50 group-hover:scale-110 transition-transform">
+                <i data-lucide="badge-dollar-sign" class="w-6 h-6"></i>
+              </div>
+              <h3 class="text-xl font-serif-editorial font-bold text-ink-900 mb-2">Stay on Budget</h3>
+              <p class="text-sm text-ink-700 leading-relaxed">
+                Track allocated, estimated, and actual spending with mathematical consistency. Receive intelligent cost-saving recommendations without compromising core priorities.
+              </p>
+            </div>
+
+            <!-- Pillar 3 -->
+            <div class="festiva-card p-7 bg-white relative overflow-hidden group">
+              <div class="w-12 h-12 rounded-xl bg-emerald-50 text-sage-accent flex items-center justify-center mb-5 border border-emerald-200/50 group-hover:scale-110 transition-transform">
+                <i data-lucide="shield-check" class="w-6 h-6"></i>
+              </div>
+              <h3 class="text-xl font-serif-editorial font-bold text-ink-900 mb-2">Celebrate With Confidence</h3>
+              <p class="text-sm text-ink-700 leading-relaxed">
+                Our signature Celebration Confidence Score analyzes completed tasks, vendor contracts, and budget reserves to give you total peace of mind on celebration day.
+              </p>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Supported Celebrations Showcase -->
+        <div class="text-center border-t border-ivory-200 pt-12">
+          <p class="text-xs uppercase tracking-widest font-bold text-ink-500 mb-6">Designed for every milestone celebration</p>
+          <div class="flex flex-wrap items-center justify-center gap-3">
+            <span class="px-4 py-2 rounded-xl bg-white border border-ivory-200 text-sm font-medium text-ink-800 shadow-sm flex items-center gap-2">💍 Weddings</span>
+            <span class="px-4 py-2 rounded-xl bg-white border border-ivory-200 text-sm font-medium text-ink-800 shadow-sm flex items-center gap-2">🎂 Milestone Birthdays</span>
+            <span class="px-4 py-2 rounded-xl bg-white border border-ivory-200 text-sm font-medium text-ink-800 shadow-sm flex items-center gap-2">🥂 Anniversaries</span>
+            <span class="px-4 py-2 rounded-xl bg-white border border-ivory-200 text-sm font-medium text-ink-800 shadow-sm flex items-center gap-2">👶 Baby Showers</span>
+            <span class="px-4 py-2 rounded-xl bg-white border border-ivory-200 text-sm font-medium text-ink-800 shadow-sm flex items-center gap-2">🏢 Corporate Galas</span>
+            <span class="px-4 py-2 rounded-xl bg-white border border-ivory-200 text-sm font-medium text-ink-800 shadow-sm flex items-center gap-2">🎪 Community Festivals</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- SECTION 2: APPLICATION DASHBOARD (VIEW) -->
+    <div id="dashboardView" class="hidden py-8 transition-all duration-300">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+        
+        <!-- EVENT HEADER BANNER -->
+        <div class="festiva-card p-6 md:p-8 bg-gradient-to-r from-ink-900 via-ink-800 to-[#2A1B3D] text-white relative overflow-hidden">
+          <!-- Background decoration -->
+          <div class="absolute -right-10 -bottom-10 w-72 h-72 bg-gold-500/10 rounded-full blur-3xl pointer-events-none"></div>
+          
+          <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div class="space-y-2">
+              <div class="flex flex-wrap items-center gap-2.5">
+                <span id="bannerEventTypeBadge" class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-gold-500/20 text-gold-300 border border-gold-500/30">Wedding</span>
+                <span id="bannerEventStyle" class="text-xs text-ivory-200 bg-white/10 px-3 py-1 rounded-full">Romantic Rustic & Elegant</span>
+                <span id="bannerDemoBadge" class="hidden px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-coral-500 text-white">Demo Plan</span>
+              </div>
+              
+              <h2 id="bannerEventName" class="text-2xl sm:text-3xl lg:text-4xl font-serif-editorial font-bold text-white tracking-tight">
+                Sophia & Liam's Tuscan Vineyard Wedding
+              </h2>
+              
+              <div class="flex flex-wrap items-center gap-4 text-xs sm:text-sm text-ivory-200 pt-1">
+                <span class="flex items-center gap-1.5"><i data-lucide="calendar" class="w-4 h-4 text-gold-400"></i><span id="bannerEventDate">Sept 18, 2026</span></span>
+                <span class="flex items-center gap-1.5"><i data-lucide="map-pin" class="w-4 h-4 text-coral-400"></i><span id="bannerEventLocation">Montalcino, Tuscany</span></span>
+                <span class="flex items-center gap-1.5"><i data-lucide="users" class="w-4 h-4 text-emerald-400"></i><span id="bannerGuestCount">110 Guests</span></span>
+                <span class="flex items-center gap-1.5"><i data-lucide="wallet" class="w-4 h-4 text-gold-400"></i><span id="bannerBudgetTotal">$45,000 Budget</span></span>
+              </div>
+            </div>
+
+            <!-- Countdown Box & Quick Actions -->
+            <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/15">
+              <div class="text-center px-2">
+                <div id="countdownNumber" class="text-3xl font-serif-editorial font-bold text-gold-300">145</div>
+                <div class="text-[10px] uppercase font-bold tracking-wider text-ivory-300">Days to Celebrate</div>
+              </div>
+              <div class="hidden sm:block h-10 w-px bg-white/20"></div>
+              <div class="flex flex-col gap-2 w-full sm:w-auto">
+                <button onclick="App.openWizard(true)" class="btn-secondary text-xs py-2 px-3 bg-white/15 border-white/30 text-white hover:bg-white/25">
+                  <i data-lucide="edit-3" class="w-3.5 h-3.5"></i> Edit Event Info
+                </button>
+                <button onclick="App.triggerConfetti()" class="text-xs font-semibold text-gold-300 hover:text-gold-200 text-center flex items-center justify-center gap-1">
+                  <i data-lucide="party-popper" class="w-3.5 h-3.5"></i> Celebrate Now
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================= TAB CONTENTS ================= -->
+        
+        <!-- TAB 1: OVERVIEW -->
+        <div id="tabContent-overview" class="tab-pane space-y-8">
+          
+          <!-- SIGNATURE DIFFERENTIATOR: CELEBRATION CONFIDENCE SCORE CARD -->
+          <div class="festiva-card p-6 md:p-8 bg-white border-2 border-gold-500/30">
+            <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8">
+              
+              <!-- Left: Gauge & Score Identity -->
+              <div class="flex items-center gap-6">
+                <div class="relative w-32 h-32 flex-shrink-0 flex items-center justify-center">
+                  <svg class="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="42" stroke="#E8E0D7" stroke-width="8" fill="none" />
+                    <circle id="scoreGaugeCircle" cx="50" cy="50" r="42" stroke="var(--sage-accent)" stroke-width="8" fill="none" stroke-dasharray="264" stroke-dashoffset="40" stroke-linecap="round" class="transition-all duration-1000 ease-out" />
+                  </svg>
+                  <div class="absolute inset-0 flex flex-col items-center justify-center text-center">
+                    <span id="scoreDisplayNumber" class="text-3xl font-serif-editorial font-bold text-ink-900 leading-none">84</span>
+                    <span class="text-[10px] uppercase font-bold text-ink-500 tracking-wider">/ 100</span>
+                  </div>
+                </div>
+
+                <div class="space-y-1.5">
+                  <div class="flex items-center gap-2">
+                    <h3 class="text-xl font-serif-editorial font-bold text-ink-900">Celebration Confidence Score</h3>
+                    <span id="scoreGradeBadge" class="festiva-badge text-emerald-800 bg-emerald-50 border-emerald-300">Peak Readiness</span>
+                  </div>
+                  <p id="scoreMessage" class="text-sm text-ink-700 max-w-md">
+                    Calculated objectively from completed tasks, verified vendor contracts, budget health, and deadline pacing.
+                  </p>
+                  <p class="text-xs text-ink-500 font-medium">Updates live with every task checkbox or vendor update.</p>
+                </div>
+              </div>
+
+              <!-- Right: 4 Factor Breakdown Bars -->
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 w-full lg:w-auto flex-grow max-w-xl">
+                
+                <div class="bg-ivory-50 p-3.5 rounded-xl border border-ivory-200">
+                  <div class="text-xs text-ink-500 font-medium mb-1">Tasks (35 pts)</div>
+                  <div id="statTasksScore" class="text-lg font-bold text-ink-900">28 / 35</div>
+                  <div class="w-full bg-ivory-200 h-1.5 rounded-full mt-2 overflow-hidden">
+                    <div id="barTasksScore" class="bg-sage-accent h-full rounded-full" style="width: 80%"></div>
+                  </div>
+                </div>
+
+                <div class="bg-ivory-50 p-3.5 rounded-xl border border-ivory-200">
+                  <div class="text-xs text-ink-500 font-medium mb-1">Vendors (30 pts)</div>
+                  <div id="statVendorsScore" class="text-lg font-bold text-ink-900">26 / 30</div>
+                  <div class="w-full bg-ivory-200 h-1.5 rounded-full mt-2 overflow-hidden">
+                    <div id="barVendorsScore" class="bg-coral-500 h-full rounded-full" style="width: 87%"></div>
+                  </div>
+                </div>
+
+                <div class="bg-ivory-50 p-3.5 rounded-xl border border-ivory-200">
+                  <div class="text-xs text-ink-500 font-medium mb-1">Budget (20 pts)</div>
+                  <div id="statBudgetScore" class="text-lg font-bold text-ink-900">18 / 20</div>
+                  <div class="w-full bg-ivory-200 h-1.5 rounded-full mt-2 overflow-hidden">
+                    <div id="barBudgetScore" class="bg-gold-500 h-full rounded-full" style="width: 90%"></div>
+                  </div>
+                </div>
+
+                <div class="bg-ivory-50 p-3.5 rounded-xl border border-ivory-200">
+                  <div class="text-xs text-ink-500 font-medium mb-1">Timeline (15 pts)</div>
+                  <div id="statTimelineScore" class="text-lg font-bold text-ink-900">14 / 15</div>
+                  <div class="w-full bg-ivory-200 h-1.5 rounded-full mt-2 overflow-hidden">
+                    <div id="barTimelineScore" class="bg-indigo-600 h-full rounded-full" style="width: 93%"></div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- RECOMMENDED NEXT ACTIONS CARDS -->
+            <div class="mt-6 pt-6 border-t border-ivory-200">
+              <div class="flex items-center justify-between mb-4">
+                <span class="text-xs uppercase font-bold tracking-wider text-ink-500">Recommended Next Actions to Boost Confidence</span>
+                <span class="text-xs text-coral-600 font-semibold">Ranked by impact</span>
+              </div>
+
+              <div id="nextActionsContainer" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <!-- Injected via JavaScript -->
+              </div>
+            </div>
+          </div>
+
+          <!-- KEY STATS & ACTIVE CONCEPT TEASER -->
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <!-- Financial Snapshot Widget -->
+            <div class="festiva-card p-6 bg-white space-y-4">
+              <div class="flex items-center justify-between">
+                <h4 class="font-serif-editorial font-bold text-lg text-ink-900">Financial Pulse</h4>
+                <button onclick="App.switchTab('budget')" class="text-xs font-semibold text-coral-500 hover:text-coral-600">View Budget &rarr;</button>
+              </div>
+
+              <div class="space-y-3">
+                <div class="flex justify-between items-center text-sm">
+                  <span class="text-ink-500">Total Budget:</span>
+                  <span id="quickTotalBudget" class="font-bold text-ink-900">$45,000</span>
+                </div>
+                <div class="flex justify-between items-center text-sm">
+                  <span class="text-ink-500">Committed / Actuals:</span>
+                  <span id="quickActualSpent" class="font-bold text-ink-900">$41,730</span>
+                </div>
+                <div class="flex justify-between items-center text-sm">
+                  <span class="text-ink-500">Remaining Balance:</span>
+                  <span id="quickRemainingBalance" class="font-bold text-sage-accent">$3,270</span>
+                </div>
+
+                <div class="w-full bg-ivory-200 h-2 rounded-full overflow-hidden mt-2">
+                  <div id="quickBudgetBar" class="bg-gold-500 h-full rounded-full" style="width: 92%"></div>
+                </div>
+                <p id="quickBudgetStatusText" class="text-xs text-ink-500 font-medium">92% allocated across 9 categories.</p>
+              </div>
+            </div>
+
+            <!-- Active Concept Highlight -->
+            <div class="festiva-card p-6 bg-white space-y-4">
+              <div class="flex items-center justify-between">
+                <h4 class="font-serif-editorial font-bold text-lg text-ink-900">Selected Concept</h4>
+                <button onclick="App.switchTab('plan')" class="text-xs font-semibold text-coral-500 hover:text-coral-600">Change Concept &rarr;</button>
+              </div>
+
+              <div class="space-y-3">
+                <div class="flex items-center gap-2">
+                  <span id="quickConceptName" class="font-bold text-ink-900 text-base">Tuscan Sun & Olive Grove Romance</span>
+                </div>
+                <p id="quickConceptTagline" class="text-xs text-ink-700 italic">"Rustic authenticity meets timeless editorial elegance"</p>
+                
+                <!-- Swatches -->
+                <div id="quickConceptSwatches" class="flex items-center gap-2 pt-1">
+                  <!-- Injected via JS -->
+                </div>
+                <p id="quickConceptDecor" class="text-xs text-ink-500 line-clamp-2">Terracotta pots, olive leaf runners, beeswax candles in brass holders.</p>
+              </div>
+            </div>
+
+            <!-- Upcoming Milestones Widget -->
+            <div class="festiva-card p-6 bg-white space-y-4">
+              <div class="flex items-center justify-between">
+                <h4 class="font-serif-editorial font-bold text-lg text-ink-900">Immediate Milestones</h4>
+                <button onclick="App.switchTab('timeline')" class="text-xs font-semibold text-coral-500 hover:text-coral-600">All Tasks &rarr;</button>
+              </div>
+
+              <div id="quickUpcomingTasks" class="space-y-2.5">
+                <!-- Injected via JS -->
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- TAB 2: MY EVENT PLAN & CONCEPTS -->
+        <div id="tabContent-plan" class="tab-pane hidden space-y-8">
+          
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h3 class="text-2xl font-serif-editorial font-bold text-ink-900">Personalized Event Concepts</h3>
+              <p class="text-sm text-ink-500">Three distinctly customized concepts generated for your style, location, and guest profile.</p>
+            </div>
+            
+            <button onclick="App.regenerateConcepts()" class="btn-secondary text-xs py-2 px-3 self-start sm:self-auto">
+              <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Regenerate Concepts
+            </button>
+          </div>
+
+          <!-- 3 Concept Cards Grid -->
+          <div id="conceptsCardsGrid" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Injected via JavaScript -->
+          </div>
+
+          <!-- Event Parameters Summary Card -->
+          <div class="festiva-card p-6 bg-white border border-ivory-200">
+            <h4 class="font-serif-editorial font-bold text-lg text-ink-900 mb-4 flex items-center gap-2">
+              <i data-lucide="sliders" class="w-5 h-5 text-gold-500"></i> Event Planning Parameters & Preferences
+            </h4>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 text-sm">
+              <div>
+                <span class="text-xs font-semibold text-ink-500 block uppercase tracking-wider mb-1">Venue Preference</span>
+                <span id="paramVenue" class="font-medium text-ink-900">Outdoor with covered backup</span>
+              </div>
+              <div>
+                <span class="text-xs font-semibold text-ink-500 block uppercase tracking-wider mb-1">Catering Format</span>
+                <span id="paramCatering" class="font-medium text-ink-900">Farm-to-table Italian banquet with wine pairing</span>
+              </div>
+              <div>
+                <span class="text-xs font-semibold text-ink-500 block uppercase tracking-wider mb-1">Dietary & Accessibility</span>
+                <span id="paramDietary" class="font-medium text-ink-900">Vegetarian (14), Gluten-Free (6), Vegan (3)</span>
+              </div>
+              <div>
+                <span class="text-xs font-semibold text-ink-500 block uppercase tracking-wider mb-1">Planning Priorities</span>
+                <span id="paramPriorities" class="font-medium text-ink-900">Guest Experience, Aesthetics, Food & Wine</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- TAB 3: INTELLIGENT BUDGET PLANNER -->
+        <div id="tabContent-budget" class="tab-pane hidden space-y-8">
+          
+          <!-- Header and Add Expense Action -->
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h3 class="text-2xl font-serif-editorial font-bold text-ink-900">Intelligent Budget Planner</h3>
+              <p class="text-sm text-ink-500">Dynamically allocated across categories with contingency reserves and real-time variance tracking.</p>
+            </div>
+            
+            <div class="flex items-center gap-3">
+              <button onclick="App.openAddBudgetItemModal()" class="btn-primary text-xs py-2 px-3.5">
+                <i data-lucide="plus" class="w-4 h-4"></i> Add Category / Item
+              </button>
+            </div>
+          </div>
+
+          <!-- Over-budget warning banner (Conditional) -->
+          <div id="budgetWarningBanner" class="hidden p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-sm flex items-start gap-3">
+            <i data-lucide="alert-triangle" class="w-5 h-5 text-rose-600 flex-shrink-0 mt-0.5"></i>
+            <div>
+              <span class="font-bold">Budget Overrun Notice:</span> Planned and actual spending exceed your total budget cap. See recommended savings opportunities below.
+            </div>
+          </div>
+
+          <!-- Financial Overview Cards -->
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="festiva-card p-5 bg-white">
+              <span class="text-xs text-ink-500 font-semibold block uppercase tracking-wider mb-1">Total Budget Cap</span>
+              <div id="budgetStatTotal" class="text-2xl font-serif-editorial font-bold text-ink-900">$45,000</div>
+              <span class="text-xs text-ink-500">Target Ceiling</span>
+            </div>
+
+            <div class="festiva-card p-5 bg-white">
+              <span class="text-xs text-ink-500 font-semibold block uppercase tracking-wider mb-1">Allocated Budget</span>
+              <div id="budgetStatAllocated" class="text-2xl font-serif-editorial font-bold text-ink-900">$45,000</div>
+              <span id="budgetAllocatedRatio" class="text-xs text-emerald-600 font-semibold">100% of Total</span>
+            </div>
+
+            <div class="festiva-card p-5 bg-white">
+              <span class="text-xs text-ink-500 font-semibold block uppercase tracking-wider mb-1">Actual & Committed</span>
+              <div id="budgetStatActual" class="text-2xl font-serif-editorial font-bold text-ink-900">$41,730</div>
+              <span id="budgetActualRatio" class="text-xs text-ink-500">Spent / Contracted</span>
+            </div>
+
+            <div class="festiva-card p-5 bg-white">
+              <span class="text-xs text-ink-500 font-semibold block uppercase tracking-wider mb-1">Remaining Balance</span>
+              <div id="budgetStatRemaining" class="text-2xl font-serif-editorial font-bold text-sage-accent">$3,270</div>
+              <span id="budgetRemainingSub" class="text-xs text-sage-accent font-semibold">Buffer Intact</span>
+            </div>
+          </div>
+
+          <!-- Chart & Savings Suggestions Dual Column -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            
+            <!-- Donut Chart & Category distribution -->
+            <div class="festiva-card p-6 bg-white lg:col-span-7 space-y-4">
+              <h4 class="font-serif-editorial font-bold text-lg text-ink-900 flex items-center justify-between">
+                <span>Budget Distribution by Category</span>
+                <span class="text-xs font-normal text-ink-500">Interactive Visualization</span>
+              </h4>
+              <div class="h-64 relative flex items-center justify-center">
+                <canvas id="budgetDistributionChart"></canvas>
+              </div>
+            </div>
+
+            <!-- Savings Opportunities -->
+            <div class="festiva-card p-6 bg-white lg:col-span-5 space-y-4">
+              <h4 class="font-serif-editorial font-bold text-lg text-ink-900 flex items-center gap-2">
+                <i data-lucide="piggy-bank" class="w-5 h-5 text-gold-500"></i>
+                Realistic Savings Opportunities
+              </h4>
+              <p class="text-xs text-ink-500">Smart trim recommendations tailored to protect your primary priorities.</p>
+              
+              <div class="space-y-3 text-xs">
+                <div class="p-3 rounded-xl bg-ivory-50 border border-ivory-200">
+                  <div class="font-bold text-ink-900 flex justify-between items-center mb-1">
+                    <span>Seasonal & Foraged Floral Runners</span>
+                    <span class="text-emerald-700 font-bold">Save ~$600</span>
+                  </div>
+                  <p class="text-ink-700">Swapping out-of-season peonies for local olive foliage and garden roses preserves scale with zero aesthetic compromise.</p>
+                </div>
+
+                <div class="p-3 rounded-xl bg-ivory-50 border border-ivory-200">
+                  <div class="font-bold text-ink-900 flex justify-between items-center mb-1">
+                    <span>Consolidated Guest Shuttle Runs</span>
+                    <span class="text-emerald-700 font-bold">Save ~$350</span>
+                  </div>
+                  <p class="text-ink-700">Scheduling 2 fixed-time departures rather than on-demand shuttles lowers driver standby fees.</p>
+                </div>
+
+                <div class="p-3 rounded-xl bg-ivory-50 border border-ivory-200">
+                  <div class="font-bold text-ink-900 flex justify-between items-center mb-1">
+                    <span>Pre-Batched Signature Cocktails</span>
+                    <span class="text-emerald-700 font-bold">Save ~$450</span>
+                  </div>
+                  <p class="text-ink-700">Speeds up bar service lines during cocktail hour and reduces bartender staffing hours by 1.</p>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Itemized Budget Allocation Table -->
+          <div class="festiva-card bg-white overflow-hidden">
+            <div class="p-5 border-b border-ivory-200 flex items-center justify-between">
+              <h4 class="font-serif-editorial font-bold text-lg text-ink-900">Itemized Category Allocations</h4>
+              <span class="text-xs text-ink-500">Click values to edit actual spending or allocations</span>
+            </div>
+
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-sm">
+                <thead class="bg-ivory-50 text-xs uppercase tracking-wider text-ink-500 border-b border-ivory-200">
+                  <tr>
+                    <th class="py-3 px-4 font-semibold">Category</th>
+                    <th class="py-3 px-4 font-semibold">Vendor / Target</th>
+                    <th class="py-3 px-4 font-semibold text-right">Allocated</th>
+                    <th class="py-3 px-4 font-semibold text-right">Estimated</th>
+                    <th class="py-3 px-4 font-semibold text-right">Actual Spent</th>
+                    <th class="py-3 px-4 font-semibold text-center">Status</th>
+                    <th class="py-3 px-4 font-semibold text-center">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="budgetItemTableBody" class="divide-y divide-ivory-200 text-ink-900">
+                  <!-- Injected via JavaScript -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- TAB 4: PERSONALIZED EXECUTION TIMELINE -->
+        <div id="tabContent-timeline" class="tab-pane hidden space-y-8">
+          
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h3 class="text-2xl font-serif-editorial font-bold text-ink-900">Personalized Execution Timeline</h3>
+              <p class="text-sm text-ink-500">Milestones anchored relative to your celebration date. Check off tasks to elevate readiness.</p>
+            </div>
+            
+            <button onclick="App.openAddTaskModal()" class="btn-primary text-xs py-2 px-3.5">
+              <i data-lucide="plus" class="w-4 h-4"></i> Add Milestone Task
+            </button>
+          </div>
+
+          <!-- Timeline Filters -->
+          <div class="flex flex-wrap items-center justify-between gap-3 bg-white p-3 rounded-xl border border-ivory-200">
+            <div class="flex flex-wrap items-center gap-2">
+              <button onclick="App.filterTimeline('all')" class="timeline-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-ivory-200 text-ink-900" data-filter="all">All Tasks</button>
+              <button onclick="App.filterTimeline('pending')" class="timeline-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold text-ink-600 hover:bg-ivory-100" data-filter="pending">Pending</button>
+              <button onclick="App.filterTimeline('in-progress')" class="timeline-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold text-ink-600 hover:bg-ivory-100" data-filter="in-progress">In Progress</button>
+              <button onclick="App.filterTimeline('completed')" class="timeline-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold text-ink-600 hover:bg-ivory-100" data-filter="completed">Completed</button>
+              <button onclick="App.filterTimeline('High')" class="timeline-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold text-ink-600 hover:bg-ivory-100" data-filter="High">High Priority</button>
+            </div>
+
+            <div class="text-xs text-ink-500 font-medium">
+              <span id="timelineCompletedCounter">7 of 18 completed</span>
+            </div>
+          </div>
+
+          <!-- Timeline Task Cards List -->
+          <div id="timelineTasksContainer" class="space-y-3">
+            <!-- Injected via JavaScript -->
+          </div>
+
+        </div>
+
+        <!-- TAB 5: SMART VENDOR CHECKLIST -->
+        <div id="tabContent-vendors" class="tab-pane hidden space-y-8">
+          
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h3 class="text-2xl font-serif-editorial font-bold text-ink-900">Smart Vendor Checklist & Contracts</h3>
+              <p class="text-sm text-ink-500">Track quotes, booking statuses, deposits paid, and balances due with verified safeguards.</p>
+            </div>
+            
+            <button onclick="App.openAddVendorModal()" class="btn-primary text-xs py-2 px-3.5">
+              <i data-lucide="plus" class="w-4 h-4"></i> Add Vendor
+            </button>
+          </div>
+
+          <!-- Trustworthy Disclaimer Banner -->
+          <div class="p-4 rounded-xl bg-ivory-100 border border-ivory-200 text-xs text-ink-700 flex items-start gap-3">
+            <i data-lucide="info" class="w-4 h-4 text-gold-600 flex-shrink-0 mt-0.5"></i>
+            <div>
+              <span class="font-bold text-ink-900">Trustworthy AI Policy:</span> AI cost suggestions are regional benchmark estimates, not binding quotes. Festiva AI never invents fictitious contact numbers or guaranteed availability. Always review official vendor contracts before payment.
+            </div>
+          </div>
+
+          <!-- Vendor Payment Summary Bar -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div class="festiva-card p-4 bg-white">
+              <span class="text-xs text-ink-500 font-medium block mb-1">Contracted Total</span>
+              <div id="vendorStatContracted" class="text-xl font-serif-editorial font-bold text-ink-900">$41,730</div>
+            </div>
+            <div class="festiva-card p-4 bg-white">
+              <span class="text-xs text-ink-500 font-medium block mb-1">Deposits Paid</span>
+              <div id="vendorStatDeposits" class="text-xl font-serif-editorial font-bold text-emerald-700">$19,830</div>
+            </div>
+            <div class="festiva-card p-4 bg-white">
+              <span class="text-xs text-ink-500 font-medium block mb-1">Balance Due</span>
+              <div id="vendorStatBalance" class="text-xl font-serif-editorial font-bold text-coral-600">$21,900</div>
+            </div>
+            <div class="festiva-card p-4 bg-white">
+              <span class="text-xs text-ink-500 font-medium block mb-1">Booking Coverage</span>
+              <div id="vendorStatCoverage" class="text-xl font-serif-editorial font-bold text-ink-900">7 / 8 Booked</div>
+            </div>
+          </div>
+
+          <!-- Vendors Grid -->
+          <div id="vendorsGridContainer" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Injected via JavaScript -->
+          </div>
+
+        </div>
+
+        <!-- TAB 6: CREATIVE IDEA STUDIO -->
+        <div id="tabContent-ideas" class="tab-pane hidden space-y-8">
+          
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h3 class="text-2xl font-serif-editorial font-bold text-ink-900">Creative Idea Studio</h3>
+              <p class="text-sm text-ink-500">Curated touches, favors, and experiential moments with Affordable, Balanced, and Premium tiers.</p>
+            </div>
+            
+            <div class="flex items-center gap-3">
+              <button onclick="App.triggerSurpriseMe()" class="btn-gold text-xs py-2 px-3.5">
+                <i data-lucide="sparkles" class="w-4 h-4"></i> Surprise Me!
+              </button>
+            </div>
+          </div>
+
+          <!-- Tier selector pills -->
+          <div class="flex items-center gap-2 bg-white p-2 rounded-xl border border-ivory-200 w-fit">
+            <span class="text-xs font-semibold text-ink-500 px-2">View Tier:</span>
+            <button onclick="App.setIdeaTier('balanced')" class="idea-tier-btn px-3 py-1 rounded-lg text-xs font-semibold bg-coral-500 text-white" data-tier="balanced">Balanced (Optimal)</button>
+            <button onclick="App.setIdeaTier('affordable')" class="idea-tier-btn px-3 py-1 rounded-lg text-xs font-semibold text-ink-700 hover:bg-ivory-100" data-tier="affordable">Affordable</button>
+            <button onclick="App.setIdeaTier('premium')" class="idea-tier-btn px-3 py-1 rounded-lg text-xs font-semibold text-ink-700 hover:bg-ivory-100" data-tier="premium">Luxury Premium</button>
+          </div>
+
+          <!-- Ideas Grid -->
+          <div id="ideasContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Injected via JavaScript -->
+          </div>
+
+        </div>
+
+        <!-- TAB 7: GUEST OVERVIEW -->
+        <div id="tabContent-guests" class="tab-pane hidden space-y-8">
+          
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h3 class="text-2xl font-serif-editorial font-bold text-ink-900">Guest Hospitality & RSVP Tracker</h3>
+              <p class="text-sm text-ink-500">Track headcounts, dietary requirements, table seating, and VIP accommodations.</p>
+            </div>
+            
+            <button onclick="App.openAddGuestModal()" class="btn-primary text-xs py-2 px-3.5">
+              <i data-lucide="user-plus" class="w-4 h-4"></i> Add Guest
+            </button>
+          </div>
+
+          <!-- Guest Stats -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div class="festiva-card p-4 bg-white">
+              <span class="text-xs text-ink-500 font-medium block mb-1">Expected Capacity</span>
+              <div id="guestStatCapacity" class="text-2xl font-serif-editorial font-bold text-ink-900">110</div>
+            </div>
+            <div class="festiva-card p-4 bg-white">
+              <span class="text-xs text-ink-500 font-medium block mb-1">Confirmed Attending</span>
+              <div id="guestStatAttending" class="text-2xl font-serif-editorial font-bold text-emerald-700">92</div>
+            </div>
+            <div class="festiva-card p-4 bg-white">
+              <span class="text-xs text-ink-500 font-medium block mb-1">Declined</span>
+              <div id="guestStatDeclined" class="text-2xl font-serif-editorial font-bold text-rose-600">6</div>
+            </div>
+            <div class="festiva-card p-4 bg-white">
+              <span class="text-xs text-ink-500 font-medium block mb-1">Awaiting RSVP</span>
+              <div id="guestStatPending" class="text-2xl font-serif-editorial font-bold text-amber-600">12</div>
+            </div>
+          </div>
+
+          <!-- Guest List Table -->
+          <div class="festiva-card bg-white overflow-hidden">
+            <div class="p-5 border-b border-ivory-200 flex items-center justify-between">
+              <h4 class="font-serif-editorial font-bold text-lg text-ink-900">Guest Directory</h4>
+              <button onclick="App.exportGuestsCSV()" class="text-xs font-semibold text-coral-500 hover:text-coral-600 flex items-center gap-1">
+                <i data-lucide="download" class="w-3.5 h-3.5"></i> Export CSV
+              </button>
+            </div>
+
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-sm">
+                <thead class="bg-ivory-50 text-xs uppercase tracking-wider text-ink-500 border-b border-ivory-200">
+                  <tr>
+                    <th class="py-3 px-4 font-semibold">Guest Name</th>
+                    <th class="py-3 px-4 font-semibold">Group</th>
+                    <th class="py-3 px-4 font-semibold text-center">RSVP</th>
+                    <th class="py-3 px-4 font-semibold text-center">Party Size</th>
+                    <th class="py-3 px-4 font-semibold">Dietary & Accessibility</th>
+                    <th class="py-3 px-4 font-semibold">Seating / Notes</th>
+                    <th class="py-3 px-4 font-semibold text-center">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="guestsTableBody" class="divide-y divide-ivory-200 text-ink-900">
+                  <!-- Injected via JavaScript -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ================= MODALS ================= -->
+
+  <!-- 1. EVENT CREATION WIZARD MODAL -->
+  <div id="wizardModal" class="fixed inset-0 z-50 modal-overlay flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl shadow-2xl border border-ivory-200 max-w-2xl w-full max-h-[90vh] flex flex-col overflow-hidden animate-in">
+      
+      <!-- Wizard Header -->
+      <div class="p-6 border-b border-ivory-200 flex items-center justify-between bg-ivory-50/70">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-bold uppercase tracking-wider text-coral-500">Festiva Intelligence Wizard</span>
+            <span id="wizardStepIndicator" class="text-xs font-semibold text-ink-500">Step 1 of 4</span>
+          </div>
+          <h3 id="wizardTitle" class="text-xl font-serif-editorial font-bold text-ink-900">Celebration Essentials</h3>
+        </div>
+        <button onclick="App.closeWizard()" class="p-2 rounded-lg text-ink-500 hover:text-ink-900 hover:bg-ivory-200">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Step Progress Bar -->
+      <div class="w-full bg-ivory-200 h-1">
+        <div id="wizardProgressBar" class="bg-coral-500 h-full transition-all duration-300" style="width: 25%"></div>
+      </div>
+
+      <!-- Wizard Form Body (Scrollable) -->
+      <div class="p-6 overflow-y-auto space-y-6 flex-grow">
+        
+        <!-- STEP 1: ESSENTIALS -->
+        <div id="wizardStep1" class="wizard-step-pane space-y-4">
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-ink-700 mb-1.5">Event Type *</label>
+            <select id="inputEventType" onchange="App.handleEventTypeChange()" class="w-full p-2.5 rounded-xl border border-ivory-200 bg-ivory-50 text-ink-900 focus:outline-none focus:border-coral-500 font-medium">
+              <option value="Wedding">Wedding</option>
+              <option value="Birthday">Milestone Birthday</option>
+              <option value="Anniversary">Anniversary</option>
+              <option value="Baby Shower">Baby Shower</option>
+              <option value="Corporate Event">Corporate Event / Gala</option>
+              <option value="Community Gathering">Community Gathering</option>
+              <option value="Festival">Festival / Fair</option>
+              <option value="Custom Event">Custom Event</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-ink-700 mb-1.5">Celebration Name *</label>
+            <input type="text" id="inputEventName" placeholder="e.g. Maya & Leo's Coastal Wedding" class="w-full p-2.5 rounded-xl border border-ivory-200 bg-ivory-50 text-ink-900 focus:outline-none focus:border-coral-500" />
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-ink-700 mb-1.5">Vision & Description</label>
+            <textarea id="inputEventDescription" rows="2" placeholder="Describe the vibe, atmosphere, and special feeling you want to evoke..." class="w-full p-2.5 rounded-xl border border-ivory-200 bg-ivory-50 text-ink-900 focus:outline-none focus:border-coral-500 text-sm"></textarea>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-ink-700 mb-1.5">Event Date *</label>
+              <input type="date" id="inputEventDate" class="w-full p-2.5 rounded-xl border border-ivory-200 bg-ivory-50 text-ink-900 focus:outline-none focus:border-coral-500" />
+            </div>
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-ink-700 mb-1.5">Location / City *</label>
+              <input type="text" id="inputEventLocation" placeholder="e.g. Napa Valley, CA or London" class="w-full p-2.5 rounded-xl border border-ivory-200 bg-ivory-50 text-ink-900 focus:outline-none focus:border-coral-500" />
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-ink-700 mb-1.5">Expected Guest Count *</label>
+            <input type="number" id="inputEventGuests" min="5" max="5000" value="80" class="w-full p-2.5 rounded-xl border border-ivory-200 bg-ivory-50 text-ink-900 focus:outline-none focus:border-coral-500" />
+          </div>
+        </div>
+
+        <!-- STEP 2: FINANCIALS & AESTHETICS -->
+        <div id="wizardStep2" class="wizard-step-pane hidden space-y-4">
+          <div class="grid grid-cols-3 gap-4">
+            <div class="col-span-2">
+              <label class="block text-xs font-bold uppercase tracking-wider text-ink-700 mb-1.5">Total Budget *</label>
+              <input type="number" id="inputEventBudget" min="500" step="100" value="25000" class="w-full p-2.5 rounded-xl border border-ivory-200 bg-ivory-50 text-ink-900 focus:outline-none focus:border-coral-500" />
+            </div>
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-ink-700 mb-1.5">Currency</label>
+              <select id="inputEventCurrency" class="w-full p-2.5 rounded-xl border border-ivory-200 bg-ivory-50 text-ink-900 focus:outline-none focus:border-coral-500">
+                <option value="USD">USD ($)</option>
+                <option value="EUR">EUR (€)</option>
+                <option value="GBP">GBP (£)</option>
+                <option value="INR">INR (₹)</option>
+                <option value="CAD">CAD (CA$)</option>
+                <option value="AUD">AUD (AU$)</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-ink-700 mb-1.5">Event Style & Ambience</label>
+            <select id="inputEventStyle" class="w-full p-2.5 rounded-xl border border-ivory-200 bg-ivory-50 text-ink-900 focus:outline-none focus:border-coral-500 font-medium">
+              <option value="Elegant & Refined">Elegant & Refined</option>
+              <option value="Romantic Rustic">Romantic Rustic</option>
+              <option value="Modern Architectural">Modern Architectural Minimalist</option>
+              <option value="Luxury Black Tie">Luxury Black Tie</option>
+              <option value="Traditional & Cultural">Traditional & Cultural</option>
+              <option value="Outdoor Sunlit Festival">Outdoor Sunlit Festival</option>
+              <option value="Vibrant Fiesta">Vibrant Fiesta</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-ink-700 mb-1.5">Preferred Palette / Theme Inspiration</label>
+            <input type="text" id="inputEventTheme" placeholder="e.g. Sage green, ivory, champagne gold, terracotta" class="w-full p-2.5 rounded-xl border border-ivory-200 bg-ivory-50 text-ink-900 focus:outline-none focus:border-coral-500" />
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-ink-700 mb-1.5">Venue Setting Preference</label>
+            <select id="inputEventVenuePref" class="w-full p-2.5 rounded-xl border border-ivory-200 bg-ivory-50 text-ink-900 focus:outline-none focus:border-coral-500">
+              <option value="Outdoor with covered backup">Outdoor with covered backup</option>
+              <option value="Exclusively Indoor Ballroom / Hall">Exclusively Indoor Ballroom / Hall</option>
+              <option value="Private Estate / Garden">Private Estate / Garden</option>
+              <option value="Rooftop with City Views">Rooftop with City Views</option>
+              <option value="Beach / Waterfront">Beach / Waterfront</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- STEP 3: HOSPITALITY & PRIORITIES -->
+        <div id="wizardStep3" class="wizard-step-pane hidden space-y-4">
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-ink-700 mb-1.5">Catering & Beverage Style</label>
+            <input type="text" id="inputEventCatering" placeholder="e.g. Multi-course plated dinner, cocktail stations, food trucks" class="w-full p-2.5 rounded-xl border border-ivory-200 bg-ivory-50 text-ink-900 focus:outline-none focus:border-coral-500" />
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-ink-700 mb-1.5">Dietary & Accessibility Requirements</label>
+            <input type="text" id="inputEventDietary" placeholder="e.g. 8 Vegetarians, 3 Gluten-Free, Wheelchair ramp access needed" class="w-full p-2.5 rounded-xl border border-ivory-200 bg-ivory-50 text-ink-900 focus:outline-none focus:border-coral-500" />
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-ink-700 mb-1.5">Cultural Traditions or Special Requests</label>
+            <input type="text" id="inputEventTraditions" placeholder="e.g. Sangeet dance, Tea ceremony, Chuppah, or Vow renewal" class="w-full p-2.5 rounded-xl border border-ivory-200 bg-ivory-50 text-ink-900 focus:outline-none focus:border-coral-500" />
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-ink-700 mb-1.5">Top Planning Priorities</label>
+            <select id="inputEventPriorities" class="w-full p-2.5 rounded-xl border border-ivory-200 bg-ivory-50 text-ink-900 focus:outline-none focus:border-coral-500 font-medium">
+              <option value="Guest Experience & Entertainment">Guest Experience & Entertainment</option>
+              <option value="Aesthetics & Photography">Aesthetics & Photography</option>
+              <option value="Strict Budget Control">Strict Budget Control</option>
+              <option value="Gourmet Food & Wine">Gourmet Food & Wine</option>
+              <option value="Stress-Free Convenience & Coordination">Stress-Free Convenience & Coordination</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- STEP 4: CONDITIONAL DETAILS & REVIEW -->
+        <div id="wizardStep4" class="wizard-step-pane hidden space-y-4">
+          <div id="conditionalQuestionsBox" class="p-4 rounded-xl bg-ivory-100 border border-ivory-200 space-y-3">
+            <span class="text-xs font-bold uppercase tracking-wider text-coral-600 block">Specific Event Details</span>
+            <div id="conditionalFieldsContainer" class="space-y-3 text-sm">
+              <!-- Dynamically populated based on event type -->
+            </div>
+          </div>
+
+          <!-- Summary review block -->
+          <div class="p-4 rounded-xl bg-white border border-ivory-200 space-y-2 text-xs">
+            <span class="font-bold uppercase tracking-wider text-ink-500 block">Plan Summary Before Generation</span>
+            <div class="flex justify-between"><span class="text-ink-500">Event:</span><span id="reviewName" class="font-bold text-ink-900">Custom Celebration</span></div>
+            <div class="flex justify-between"><span class="text-ink-500">Date & Location:</span><span id="reviewDateLocation" class="font-bold text-ink-900">Sept 2026</span></div>
+            <div class="flex justify-between"><span class="text-ink-500">Budget:</span><span id="reviewBudget" class="font-bold text-coral-600">$25,000 USD</span></div>
+            <div class="flex justify-between"><span class="text-ink-500">Guest Count:</span><span id="reviewGuests" class="font-bold text-ink-900">80 Guests</span></div>
+          </div>
+
+          <!-- Generation loading indicator (hidden until clicked) -->
+          <div id="wizardLoadingStatus" class="hidden p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-center space-y-2">
+            <div class="inline-flex items-center gap-2 text-emerald-800 font-semibold text-sm">
+              <i data-lucide="loader" class="w-4 h-4 animate-spin text-emerald-600"></i>
+              <span id="wizardLoadingMsg">Synthesizing personalized celebration plan...</span>
+            </div>
+            <div class="w-full bg-emerald-200 h-1.5 rounded-full overflow-hidden">
+              <div id="wizardGenProgress" class="bg-emerald-600 h-full transition-all duration-300" style="width: 35%"></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Wizard Footer Navigation -->
+      <div class="p-4 border-t border-ivory-200 bg-ivory-50/70 flex items-center justify-between">
+        <button id="wizardBackBtn" onclick="App.prevWizardStep()" class="btn-secondary text-xs py-2 px-4 invisible">
+          &larr; Back
+        </button>
+
+        <div class="flex items-center gap-2">
+          <button id="wizardNextBtn" onclick="App.nextWizardStep()" class="btn-primary text-xs py-2 px-5">
+            Continue &rarr;
+          </button>
+          <button id="wizardGenerateBtn" onclick="App.submitWizardGeneration()" class="btn-gold text-xs py-2.5 px-6 hidden shadow-md">
+            <i data-lucide="sparkles" class="w-4 h-4"></i> Generate My Perfect Plan
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 2. AI ENGINE SETTINGS MODAL -->
+  <div id="aiModal" class="fixed inset-0 z-50 modal-overlay flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl shadow-2xl border border-ivory-200 max-w-md w-full p-6 space-y-5 animate-in">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center">
+            <i data-lucide="cpu" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h3 class="font-serif-editorial font-bold text-lg text-ink-900">AI Engine Settings</h3>
+            <span class="text-xs text-ink-500">Google Gemini & Intelligence Mode</span>
+          </div>
+        </div>
+        <button onclick="App.closeAiModal()" class="p-1.5 rounded-lg text-ink-500 hover:text-ink-900 hover:bg-ivory-100">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <div class="space-y-3 text-xs text-ink-700">
+        <p>
+          Festiva AI seamlessly toggles between <strong>Google Gemini Generative AI</strong> (when an API key is present) and the built-in <strong>Festiva Intelligent Heuristic Engine</strong>.
+        </p>
+
+        <div class="p-3 rounded-xl bg-ivory-50 border border-ivory-200">
+          <label class="block font-bold uppercase tracking-wider text-ink-700 mb-1">Google Gemini API Key (Optional)</label>
+          <input type="password" id="inputGeminiApiKey" placeholder="AIzaSy..." class="w-full p-2.5 rounded-lg border border-ivory-200 bg-white text-xs text-ink-900 focus:outline-none focus:border-coral-500" />
+          <span class="text-[11px] text-ink-500 mt-1 block">Stored securely in your local browser only. Never transmitted elsewhere.</span>
+        </div>
+
+        <div class="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 space-y-1">
+          <div class="font-bold flex items-center gap-1.5">
+            <i data-lucide="check-circle" class="w-3.5 h-3.5 text-emerald-600"></i> Active Status
+          </div>
+          <div id="aiEngineCurrentStatusText" class="text-xs">
+            Using Festiva Heuristic Intelligence Engine (Fast, mathematically verified, zero setup required).
+          </div>
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-2 pt-2">
+        <button onclick="App.closeAiModal()" class="btn-secondary text-xs py-2 px-3">Close</button>
+        <button onclick="App.saveAiSettings()" class="btn-primary text-xs py-2 px-4">Save Settings</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. ADD TASK MODAL -->
+  <div id="addTaskModal" class="fixed inset-0 z-50 modal-overlay flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl shadow-2xl border border-ivory-200 max-w-md w-full p-6 space-y-4 animate-in">
+      <div class="flex items-center justify-between">
+        <h3 class="font-serif-editorial font-bold text-lg text-ink-900">Add Milestone Task</h3>
+        <button onclick="App.closeAddTaskModal()" class="p-1.5 rounded-lg text-ink-500 hover:text-ink-900 hover:bg-ivory-100">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="block font-bold text-ink-700 mb-1">Task Title *</label>
+          <input type="text" id="newTaskTitle" placeholder="e.g. Finalize floral centerpieces" class="w-full p-2.5 rounded-lg border border-ivory-200 bg-ivory-50 text-ink-900 focus:outline-none focus:border-coral-500" />
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-ink-700 mb-1">Category</label>
+            <input type="text" id="newTaskCategory" placeholder="Decor, Catering, Venue..." class="w-full p-2.5 rounded-lg border border-ivory-200 bg-ivory-50 text-ink-900 focus:outline-none focus:border-coral-500" />
+          </div>
+          <div>
+            <label class="block font-bold text-ink-700 mb-1">Deadline Date</label>
+            <input type="date" id="newTaskDeadline" class="w-full p-2.5 rounded-lg border border-ivory-200 bg-ivory-50 text-ink-900 focus:outline-none focus:border-coral-500" />
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-ink-700 mb-1">Priority</label>
+            <select id="newTaskPriority" class="w-full p-2.5 rounded-lg border border-ivory-200 bg-ivory-50 text-ink-900">
+              <option value="High">High</option>
+              <option value="Medium" selected>Medium</option>
+              <option value="Low">Low</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-bold text-ink-700 mb-1">Owner / Assignee</label>
+            <input type="text" id="newTaskOwner" placeholder="Host, Planner, Partner..." class="w-full p-2.5 rounded-lg border border-ivory-200 bg-ivory-50 text-ink-900 focus:outline-none focus:border-coral-500" />
+          </div>
+        </div>
+        <div>
+          <label class="block font-bold text-ink-700 mb-1">Notes / Reminders</label>
+          <textarea id="newTaskNotes" rows="2" placeholder="Specific vendor contact or details..." class="w-full p-2.5 rounded-lg border border-ivory-200 bg-ivory-50 text-ink-900 focus:outline-none focus:border-coral-500"></textarea>
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-2 pt-2">
+        <button onclick="App.closeAddTaskModal()" class="btn-secondary text-xs py-2 px-3">Cancel</button>
+        <button onclick="App.saveNewTask()" class="btn-primary text-xs py-2 px-4">Add Task</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. ADD VENDOR MODAL -->
+  <div id="addVendorModal" class="fixed inset-0 z-50 modal-overlay flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl shadow-2xl border border-ivory-200 max-w-lg w-full p-6 space-y-4 animate-in">
+      <div class="flex items-center justify-between">
+        <h3 class="font-serif-editorial font-bold text-lg text-ink-900">Add or Edit Vendor</h3>
+        <button onclick="App.closeAddVendorModal()" class="p-1.5 rounded-lg text-ink-500 hover:text-ink-900 hover:bg-ivory-100">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="block font-bold text-ink-700 mb-1">Vendor / Business Name *</label>
+          <input type="text" id="newVendorName" placeholder="e.g. Bella Luce Photography" class="w-full p-2.5 rounded-lg border border-ivory-200 bg-ivory-50 text-ink-900 focus:outline-none focus:border-coral-500" />
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-ink-700 mb-1">Service Category</label>
+            <input type="text" id="newVendorCategory" placeholder="Photography, Catering, Florals..." class="w-full p-2.5 rounded-lg border border-ivory-200 bg-ivory-50 text-ink-900 focus:outline-none focus:border-coral-500" />
+          </div>
+          <div>
+            <label class="block font-bold text-ink-700 mb-1">Booking Status</label>
+            <select id="newVendorStatus" class="w-full p-2.5 rounded-lg border border-ivory-200 bg-ivory-50 text-ink-900">
+              <option value="Inquiry">Inquiry</option>
+              <option value="Shortlisted">Shortlisted</option>
+              <option value="Booked" selected>Booked</option>
+              <option value="Completed">Completed</option>
+            </select>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-ink-700 mb-1">Contracted / Actual Cost</label>
+            <input type="number" id="newVendorActualCost" min="0" value="2500" class="w-full p-2.5 rounded-lg border border-ivory-200 bg-ivory-50 text-ink-900 focus:outline-none focus:border-coral-500" />
+          </div>
+          <div>
+            <label class="block font-bold text-ink-700 mb-1">Deposit Paid</label>
+            <input type="number" id="newVendorDepositPaid" min="0" value="1000" class="w-full p-2.5 rounded-lg border border-ivory-200 bg-ivory-50 text-ink-900 focus:outline-none focus:border-coral-500" />
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-ink-700 mb-1">Contact Name</label>
+            <input type="text" id="newVendorContactPerson" placeholder="Matteo Rossi" class="w-full p-2.5 rounded-lg border border-ivory-200 bg-ivory-50 text-ink-900 focus:outline-none focus:border-coral-500" />
+          </div>
+          <div>
+            <label class="block font-bold text-ink-700 mb-1">Contact Phone / Email</label>
+            <input type="text" id="newVendorContactInfo" placeholder="+1 555-0192 or email" class="w-full p-2.5 rounded-lg border border-ivory-200 bg-ivory-50 text-ink-900 focus:outline-none focus:border-coral-500" />
+          </div>
+        </div>
+        <div>
+          <label class="block font-bold text-ink-700 mb-1">Contract Scope & Deliverables</label>
+          <textarea id="newVendorNotes" rows="2" placeholder="8-hour package, raw video files included, 50% due at booking..." class="w-full p-2.5 rounded-lg border border-ivory-200 bg-ivory-50 text-ink-900 focus:outline-none focus:border-coral-500"></textarea>
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-2 pt-2">
+        <button onclick="App.closeAddVendorModal()" class="btn-secondary text-xs py-2 px-3">Cancel</button>
+        <button onclick="App.saveNewVendor()" class="btn-primary text-xs py-2 px-4">Save Vendor</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. ADD BUDGET ITEM MODAL -->
+  <div id="addBudgetItemModal" class="fixed inset-0 z-50 modal-overlay flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl shadow-2xl border border-ivory-200 max-w-md w-full p-6 space-y-4 animate-in">
+      <div class="flex items-center justify-between">
+        <h3 class="font-serif-editorial font-bold text-lg text-ink-900">Add Budget Category Item</h3>
+        <button onclick="App.closeAddBudgetItemModal()" class="p-1.5 rounded-lg text-ink-500 hover:text-ink-900 hover:bg-ivory-100">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="block font-bold text-ink-700 mb-1">Category Name *</label>
+          <input type="text" id="newBudgetCategory" placeholder="e.g. Late-Night Dessert Cart" class="w-full p-2.5 rounded-lg border border-ivory-200 bg-ivory-50 text-ink-900 focus:outline-none focus:border-coral-500" />
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-ink-700 mb-1">Allocated Budget</label>
+            <input type="number" id="newBudgetAllocated" min="0" value="800" class="w-full p-2.5 rounded-lg border border-ivory-200 bg-ivory-50 text-ink-900 focus:outline-none focus:border-coral-500" />
+          </div>
+          <div>
+            <label class="block font-bold text-ink-700 mb-1">Actual Spent (So Far)</label>
+            <input type="number" id="newBudgetActual" min="0" value="0" class="w-full p-2.5 rounded-lg border border-ivory-200 bg-ivory-50 text-ink-900 focus:outline-none focus:border-coral-500" />
+          </div>
+        </div>
+        <div>
+          <label class="block font-bold text-ink-700 mb-1">Vendor / Note</label>
+          <input type="text" id="newBudgetNotes" placeholder="Vendor quote, inclusions..." class="w-full p-2.5 rounded-lg border border-ivory-200 bg-ivory-50 text-ink-900 focus:outline-none focus:border-coral-500" />
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-2 pt-2">
+        <button onclick="App.closeAddBudgetItemModal()" class="btn-secondary text-xs py-2 px-3">Cancel</button>
+        <button onclick="App.saveNewBudgetItem()" class="btn-primary text-xs py-2 px-4">Add Item</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. ADD GUEST MODAL -->
+  <div id="addGuestModal" class="fixed inset-0 z-50 modal-overlay flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl shadow-2xl border border-ivory-200 max-w-md w-full p-6 space-y-4 animate-in">
+      <div class="flex items-center justify-between">
+        <h3 class="font-serif-editorial font-bold text-lg text-ink-900">Add Guest</h3>
+        <button onclick="App.closeAddGuestModal()" class="p-1.5 rounded-lg text-ink-500 hover:text-ink-900 hover:bg-ivory-100">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="block font-bold text-ink-700 mb-1">Guest / Family Name *</label>
+          <input type="text" id="newGuestName" placeholder="e.g. Marcus & Camilla Laurent" class="w-full p-2.5 rounded-lg border border-ivory-200 bg-ivory-50 text-ink-900 focus:outline-none focus:border-coral-500" />
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-ink-700 mb-1">Group</label>
+            <input type="text" id="newGuestGroup" placeholder="Family, VIP, Friends..." class="w-full p-2.5 rounded-lg border border-ivory-200 bg-ivory-50 text-ink-900 focus:outline-none focus:border-coral-500" />
+          </div>
+          <div>
+            <label class="block font-bold text-ink-700 mb-1">Party Headcount</label>
+            <input type="number" id="newGuestCount" min="1" max="10" value="2" class="w-full p-2.5 rounded-lg border border-ivory-200 bg-ivory-50 text-ink-900 focus:outline-none focus:border-coral-500" />
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-ink-700 mb-1">RSVP Status</label>
+            <select id="newGuestRsvp" class="w-full p-2.5 rounded-lg border border-ivory-200 bg-ivory-50 text-ink-900">
+              <option value="attending">Attending</option>
+              <option value="pending" selected>Awaiting Response</option>
+              <option value="declined">Declined</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-bold text-ink-700 mb-1">Dietary Restrictions</label>
+            <input type="text" id="newGuestDietary" placeholder="Vegetarian, Nut allergy..." class="w-full p-2.5 rounded-lg border border-ivory-200 bg-ivory-50 text-ink-900 focus:outline-none focus:border-coral-500" />
+          </div>
+        </div>
+        <div>
+          <label class="block font-bold text-ink-700 mb-1">Table Seating / Notes</label>
+          <input type="text" id="newGuestNotes" placeholder="Table 2, High chair needed..." class="w-full p-2.5 rounded-lg border border-ivory-200 bg-ivory-50 text-ink-900 focus:outline-none focus:border-coral-500" />
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-2 pt-2">
+        <button onclick="App.closeAddGuestModal()" class="btn-secondary text-xs py-2 px-3">Cancel</button>
+        <button onclick="App.saveNewGuest()" class="btn-primary text-xs py-2 px-4">Add Guest</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7. EXPORT / PRINT MODAL -->
+  <div id="exportModal" class="fixed inset-0 z-50 modal-overlay flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl shadow-2xl border border-ivory-200 max-w-lg w-full p-6 space-y-5 animate-in">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-lg bg-coral-100 text-coral-600 flex items-center justify-center">
+            <i data-lucide="share-2" class="w-5 h-5"></i>
+          </div>
+          <h3 class="font-serif-editorial font-bold text-lg text-ink-900">Export & Print Celebration Plan</h3>
+        </div>
+        <button onclick="App.closeExportModal()" class="p-1.5 rounded-lg text-ink-500 hover:text-ink-900 hover:bg-ivory-100">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <p class="text-xs text-ink-700">
+        Share your complete event plan with coordinators, vendors, or family members.
+      </p>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+        <button onclick="App.copyPlanSummaryToClipboard()" class="festiva-card p-4 text-left hover:border-coral-500 flex flex-col gap-1 transition-colors">
+          <div class="font-bold text-ink-900 flex items-center gap-1.5"><i data-lucide="clipboard-copy" class="w-4 h-4 text-coral-500"></i> Copy Plan Summary</div>
+          <span class="text-ink-500">Formatted text overview for email or messaging.</span>
+        </button>
+
+        <button onclick="window.print()" class="festiva-card p-4 text-left hover:border-coral-500 flex flex-col gap-1 transition-colors">
+          <div class="font-bold text-ink-900 flex items-center gap-1.5"><i data-lucide="printer" class="w-4 h-4 text-gold-500"></i> Print / Save as PDF</div>
+          <span class="text-ink-500">Print-optimized physical binder layout.</span>
+        </button>
+
+        <button onclick="App.exportJSON()" class="festiva-card p-4 text-left hover:border-coral-500 flex flex-col gap-1 transition-colors">
+          <div class="font-bold text-ink-900 flex items-center gap-1.5"><i data-lucide="file-json" class="w-4 h-4 text-sage-accent"></i> Download JSON</div>
+          <span class="text-ink-500">Complete raw event state backup.</span>
+        </button>
+
+        <button onclick="App.resetEventDataPrompt()" class="festiva-card p-4 text-left hover:border-rose-500 flex flex-col gap-1 transition-colors">
+          <div class="font-bold text-rose-700 flex items-center gap-1.5"><i data-lucide="trash-2" class="w-4 h-4 text-rose-600"></i> Reset Event Data</div>
+          <span class="text-ink-500">Start clean or restore original demo.</span>
+        </button>
+      </div>
+
+      <div class="flex justify-end pt-2">
+        <button onclick="App.closeExportModal()" class="btn-secondary text-xs py-2 px-4">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATIONS CONTAINER -->
+  <div id="toastContainer"></div>
+
+  <!-- APPLICATION JAVASCRIPT MODULES -->
+  <script src="demo-data.js"></script>
+  <script src="confidence-engine.js"></script>
+  <script src="ai-engine.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

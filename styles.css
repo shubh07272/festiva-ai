@@ -1,0 +1,330 @@
+/* Festiva AI - Editorial Celebration Visual Design System */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&display=swap');
+
+:root {
+  --ivory-base: #FAF8F5;
+  --ivory-card: #FFFFFF;
+  --ivory-subtle: #F5EFEB;
+  --ivory-border: #E8E0D7;
+  
+  --ink-primary: #1E152A;
+  --ink-secondary: #4A3E56;
+  --ink-muted: #7A6F86;
+  
+  --coral-accent: #E06A55;
+  --coral-hover: #CC5743;
+  --coral-soft: #FDF1EE;
+  
+  --gold-primary: #C5A059;
+  --gold-light: #F7F1E5;
+  --gold-hover: #B08B42;
+
+  --sage-accent: #4A7C59;
+  --sage-soft: #EEF5F0;
+  
+  --font-serif: 'Playfair Display', Georgia, serif;
+  --font-editorial: 'Cormorant Garamond', Garamond, serif;
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  
+  --shadow-card: 0 4px 20px -2px rgba(30, 21, 42, 0.05), 0 2px 6px -1px rgba(30, 21, 42, 0.03);
+  --shadow-float: 0 16px 36px -4px rgba(30, 21, 42, 0.10), 0 6px 12px -2px rgba(30, 21, 42, 0.04);
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--ivory-base);
+  color: var(--ink-primary);
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.font-serif-editorial {
+  font-family: var(--font-serif);
+}
+
+.font-garamond {
+  font-family: var(--font-editorial);
+}
+
+/* Custom subtle scrollbar */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+::-webkit-scrollbar-track {
+  background: var(--ivory-base);
+}
+::-webkit-scrollbar-thumb {
+  background: #D8D0C5;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #C4B9AD;
+}
+
+/* Card Styling */
+.festiva-card {
+  background-color: var(--ivory-card);
+  border: 1px solid var(--ivory-border);
+  box-shadow: var(--shadow-card);
+  border-radius: 1rem;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.festiva-card:hover {
+  box-shadow: var(--shadow-float);
+  border-color: #DCCFC1;
+}
+
+/* Glass Header */
+.glass-nav {
+  background: rgba(250, 248, 245, 0.88);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(232, 224, 215, 0.7);
+}
+
+/* Editorial badge */
+.festiva-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border-radius: 9999px;
+  border: 1px solid transparent;
+}
+
+/* Button styles */
+.btn-primary {
+  background-color: var(--coral-accent);
+  color: #FFFFFF;
+  font-weight: 600;
+  border-radius: 0.75rem;
+  padding: 0.75rem 1.75rem;
+  box-shadow: 0 4px 14px rgba(224, 106, 85, 0.3);
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.btn-primary:hover {
+  background-color: var(--coral-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(224, 106, 85, 0.4);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.btn-secondary {
+  background-color: #FFFFFF;
+  color: var(--ink-primary);
+  border: 1px solid var(--ivory-border);
+  font-weight: 600;
+  border-radius: 0.75rem;
+  padding: 0.75rem 1.75rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.btn-secondary:hover {
+  border-color: var(--gold-primary);
+  color: var(--gold-hover);
+  background-color: #FFFDF9;
+}
+
+.btn-gold {
+  background: linear-gradient(135deg, #D4AF37 0%, #C5A059 100%);
+  color: #FFFFFF;
+  font-weight: 600;
+  border-radius: 0.75rem;
+  padding: 0.75rem 1.75rem;
+  box-shadow: 0 4px 14px rgba(197, 160, 89, 0.35);
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.btn-gold:hover {
+  background: linear-gradient(135deg, #DFBD4D 0%, #B08B42 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(197, 160, 89, 0.45);
+}
+
+/* Tab active highlight */
+.tab-btn {
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.tab-btn.active {
+  color: var(--coral-accent);
+  font-weight: 700;
+}
+
+.tab-btn.active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  height: 2.5px;
+  background-color: var(--coral-accent);
+  border-radius: 9999px;
+}
+
+/* Radial Gauge Indicator */
+.score-circle {
+  position: relative;
+  width: 140px;
+  height: 140px;
+}
+
+.score-circle svg {
+  transform: rotate(-90deg);
+}
+
+.score-circle circle {
+  fill: none;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.8s ease-in-out;
+}
+
+/* Palette Swatches */
+.swatch-chip {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 9999px;
+  border: 2px solid #FFFFFF;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+  transition: transform 0.2s ease;
+}
+.swatch-chip:hover {
+  transform: scale(1.15);
+}
+
+/* Timeline Custom Checkbox */
+.custom-checkbox {
+  appearance: none;
+  width: 1.35rem;
+  height: 1.35rem;
+  border: 2px solid #D2C8BC;
+  border-radius: 0.375rem;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: grid;
+  place-content: center;
+}
+
+.custom-checkbox:checked {
+  background-color: var(--sage-accent);
+  border-color: var(--sage-accent);
+}
+
+.custom-checkbox:checked::before {
+  content: "";
+  width: 0.55rem;
+  height: 0.35rem;
+  border-left: 2px solid #FFF;
+  border-bottom: 2px solid #FFF;
+  transform: rotate(-45deg) translate(1px, -1px);
+}
+
+/* Micro Toast Notification */
+#toastContainer {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none;
+}
+
+.festiva-toast {
+  pointer-events: auto;
+  background: #1E152A;
+  color: #FFFFFF;
+  padding: 12px 18px;
+  border-radius: 10px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  animation: toastIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  border-left: 4px solid var(--coral-accent);
+}
+
+@keyframes toastIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Modal Backdrop */
+.modal-overlay {
+  background-color: rgba(30, 21, 42, 0.55);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+/* Pulsing AI Indicator */
+.ai-pulse-dot {
+  width: 8px;
+  height: 8px;
+  background-color: #10B981;
+  border-radius: 50%;
+  box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+  animation: aiPulse 2s infinite;
+}
+
+@keyframes aiPulse {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+  70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+/* PRINT MEDIA STYLES - Clean physical PDF/Print Brief */
+@media print {
+  body {
+    background: #FFF !important;
+    color: #000 !important;
+    font-size: 11pt;
+  }
+  .no-print, header, nav, #toastContainer, .btn-primary, .btn-secondary, .btn-gold, button {
+    display: none !important;
+  }
+  .festiva-card {
+    box-shadow: none !important;
+    border: 1px solid #CCC !important;
+    break-inside: avoid;
+    margin-bottom: 20px;
+  }
+  .print-only {
+    display: block !important;
+  }
+  #dashboardView {
+    display: block !important;
+  }
+  .tab-content {
+    display: block !important;
+    margin-bottom: 30px;
+  }
+}
