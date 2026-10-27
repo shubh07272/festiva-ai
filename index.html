@@ -87,7 +87,7 @@
       <div class="flex items-center gap-3">
         
         <!-- AI Engine Status Pill -->
-        <button onclick="App.openAiModal()" id="aiStatusPill" class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200 hover:bg-emerald-100 transition-colors" title="Configure AI Engine settings & API key">
+        <button onclick="App.openAiModal()" id="aiStatusPill" class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200 hover:bg-emerald-100 transition-colors" title="View AI engine status and secure backend settings">
           <span class="ai-pulse-dot"></span>
           <span id="aiStatusLabel">Festiva Intelligence</span>
           <i data-lucide="settings" class="w-3.5 h-3.5 text-emerald-600"></i>
@@ -187,7 +187,7 @@
               <div class="h-16 w-px bg-ivory-200"></div>
               <div class="space-y-2 text-xs">
                 <div class="flex justify-between gap-4"><span class="text-ink-500">Tasks Completed:</span><span class="font-bold text-ink-900">11 / 18 (61%)</span></div>
-                <div class="flex justify-between gap-4"><span class="text-ink-500">Vendors Locked:</span><span class="font-bold text-ink-900">8 of 8 Booked</span></div>
+                <div class="flex justify-between gap-4"><span class="text-ink-500">Vendors Locked:</span><span class="font-bold text-ink-900">8 of 8 Confirmed</span></div>
                 <div class="flex justify-between gap-4"><span class="text-ink-500">Budget Health:</span><span class="font-bold text-emerald-600">Within Target</span></div>
               </div>
             </div>
@@ -277,7 +277,7 @@
               </h2>
               
               <div class="flex flex-wrap items-center gap-4 text-xs sm:text-sm text-ivory-200 pt-1">
-                <span class="flex items-center gap-1.5"><i data-lucide="calendar" class="w-4 h-4 text-gold-400"></i><span id="bannerEventDate">Sept 18, 2026</span></span>
+                <span class="flex items-center gap-1.5"><i data-lucide="calendar" class="w-4 h-4 text-gold-400"></i><span id="bannerEventDate">Event date loads dynamically</span></span>
                 <span class="flex items-center gap-1.5"><i data-lucide="map-pin" class="w-4 h-4 text-coral-400"></i><span id="bannerEventLocation">Montalcino, Tuscany</span></span>
                 <span class="flex items-center gap-1.5"><i data-lucide="users" class="w-4 h-4 text-emerald-400"></i><span id="bannerGuestCount">110 Guests</span></span>
                 <span class="flex items-center gap-1.5"><i data-lucide="wallet" class="w-4 h-4 text-gold-400"></i><span id="bannerBudgetTotal">$45,000 Budget</span></span>
@@ -287,8 +287,8 @@
             <!-- Countdown Box & Quick Actions -->
             <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/15">
               <div class="text-center px-2">
-                <div id="countdownNumber" class="text-3xl font-serif-editorial font-bold text-gold-300">145</div>
-                <div class="text-[10px] uppercase font-bold tracking-wider text-ivory-300">Days to Celebrate</div>
+                <div id="countdownNumber" class="text-3xl font-serif-editorial font-bold text-gold-300">—</div>
+                <div id="countdownLabel" class="text-[10px] uppercase font-bold tracking-wider text-ivory-300">Days to Celebrate</div>
               </div>
               <div class="hidden sm:block h-10 w-px bg-white/20"></div>
               <div class="flex flex-col gap-2 w-full sm:w-auto">
@@ -320,7 +320,7 @@
                     <circle id="scoreGaugeCircle" cx="50" cy="50" r="42" stroke="var(--sage-accent)" stroke-width="8" fill="none" stroke-dasharray="264" stroke-dashoffset="40" stroke-linecap="round" class="transition-all duration-1000 ease-out" />
                   </svg>
                   <div class="absolute inset-0 flex flex-col items-center justify-center text-center">
-                    <span id="scoreDisplayNumber" class="text-3xl font-serif-editorial font-bold text-ink-900 leading-none">84</span>
+                    <span id="scoreDisplayNumber" class="text-3xl font-serif-editorial font-bold text-ink-900 leading-none">86</span>
                     <span class="text-[10px] uppercase font-bold text-ink-500 tracking-wider">/ 100</span>
                   </div>
                 </div>
@@ -331,7 +331,7 @@
                     <span id="scoreGradeBadge" class="festiva-badge text-emerald-800 bg-emerald-50 border-emerald-300">Peak Readiness</span>
                   </div>
                   <p id="scoreMessage" class="text-sm text-ink-700 max-w-md">
-                    Calculated objectively from completed tasks, verified vendor contracts, budget health, and deadline pacing.
+                    Calculated objectively from completed tasks, confirmed vendor bookings, budget health, and deadline pacing.
                   </p>
                   <p class="text-xs text-ink-500 font-medium">Updates live with every task checkbox or vendor update.</p>
                 </div>
@@ -405,11 +405,11 @@
                 </div>
                 <div class="flex justify-between items-center text-sm">
                   <span class="text-ink-500">Committed / Actuals:</span>
-                  <span id="quickActualSpent" class="font-bold text-ink-900">$41,730</span>
+                  <span id="quickActualSpent" class="font-bold text-ink-900">$42,130</span>
                 </div>
                 <div class="flex justify-between items-center text-sm">
                   <span class="text-ink-500">Remaining Balance:</span>
-                  <span id="quickRemainingBalance" class="font-bold text-sage-accent">$3,270</span>
+                  <span id="quickRemainingBalance" class="font-bold text-sage-accent">$2,870</span>
                 </div>
 
                 <div class="w-full bg-ivory-200 h-2 rounded-full overflow-hidden mt-2">
@@ -524,7 +524,7 @@
           <div id="budgetWarningBanner" class="hidden p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-sm flex items-start gap-3">
             <i data-lucide="alert-triangle" class="w-5 h-5 text-rose-600 flex-shrink-0 mt-0.5"></i>
             <div>
-              <span class="font-bold">Budget Overrun Notice:</span> Planned and actual spending exceed your total budget cap. See recommended savings opportunities below.
+              <span class="font-bold">Budget Alert:</span> <span id="budgetWarningMessage">A budget threshold has been exceeded. Review the totals below.</span>
             </div>
           </div>
 
@@ -543,15 +543,15 @@
             </div>
 
             <div class="festiva-card p-5 bg-white">
-              <span class="text-xs text-ink-500 font-semibold block uppercase tracking-wider mb-1">Actual & Committed</span>
-              <div id="budgetStatActual" class="text-2xl font-serif-editorial font-bold text-ink-900">$41,730</div>
-              <span id="budgetActualRatio" class="text-xs text-ink-500">Spent / Contracted</span>
+              <span class="text-xs text-ink-500 font-semibold block uppercase tracking-wider mb-1">Recorded Spend</span>
+              <div id="budgetStatActual" class="text-2xl font-serif-editorial font-bold text-ink-900">$42,130</div>
+              <span id="budgetActualRatio" class="text-xs text-ink-500">94% of budget recorded</span>
             </div>
 
             <div class="festiva-card p-5 bg-white">
               <span class="text-xs text-ink-500 font-semibold block uppercase tracking-wider mb-1">Remaining Balance</span>
-              <div id="budgetStatRemaining" class="text-2xl font-serif-editorial font-bold text-sage-accent">$3,270</div>
-              <span id="budgetRemainingSub" class="text-xs text-sage-accent font-semibold">Buffer Intact</span>
+              <div id="budgetStatRemaining" class="text-2xl font-serif-editorial font-bold text-sage-accent">$2,870</div>
+              <span id="budgetRemainingSub" class="text-xs text-sage-accent font-semibold">Available vs actual spend</span>
             </div>
           </div>
 
@@ -660,7 +660,7 @@
             </div>
 
             <div class="text-xs text-ink-500 font-medium">
-              <span id="timelineCompletedCounter">7 of 18 completed</span>
+              <span id="timelineCompletedCounter">11 of 18 completed</span>
             </div>
           </div>
 
@@ -709,7 +709,7 @@
             </div>
             <div class="festiva-card p-4 bg-white">
               <span class="text-xs text-ink-500 font-medium block mb-1">Booking Coverage</span>
-              <div id="vendorStatCoverage" class="text-xl font-serif-editorial font-bold text-ink-900">7 / 8 Booked</div>
+              <div id="vendorStatCoverage" class="text-xl font-serif-editorial font-bold text-ink-900">8 / 8 Confirmed</div>
             </div>
           </div>
 
@@ -1042,13 +1042,16 @@
 
       <div class="space-y-3 text-xs text-ink-700">
         <p>
-          Festiva AI seamlessly toggles between <strong>Google Gemini Generative AI</strong> (when an API key is present) and the built-in <strong>Festiva Intelligent Heuristic Engine</strong>.
+          Festiva AI uses the built-in <strong>Festiva Intelligent Heuristic Engine</strong> by default. When a secured server-side Gemini backend is configured, new plans can use <strong>Google Gemini Generative AI</strong>.
+        </p>
+        <p class="p-3 rounded-xl border border-amber-200 bg-amber-50 text-amber-900">
+          With Gemini enabled, selected event details (such as date, location, budget, dietary notes, and cultural preferences) are sent to Google to generate a plan. The guest directory is not included. Avoid entering sensitive personal information.
         </p>
 
         <div class="p-3 rounded-xl bg-ivory-50 border border-ivory-200">
-          <label class="block font-bold uppercase tracking-wider text-ink-700 mb-1">Google Gemini API Key (Optional)</label>
-          <input type="password" id="inputGeminiApiKey" placeholder="AIzaSy..." class="w-full p-2.5 rounded-lg border border-ivory-200 bg-white text-xs text-ink-900 focus:outline-none focus:border-coral-500" />
-          <span class="text-[11px] text-ink-500 mt-1 block">Stored securely in your local browser only. Never transmitted elsewhere.</span>
+          <div class="font-bold uppercase tracking-wider text-ink-700 mb-1">Secure Gemini configuration</div>
+          <p class="text-[11px] text-ink-600">For Gemini mode, set <code>GEMINI_API_KEY</code> as an environment variable on your backend host. Never paste a secret into this page or commit it to GitHub. The browser does not store an API key.</p>
+          <p class="text-[11px] text-ink-500 mt-2">When no secured backend is configured, all planning features continue to work using the built-in heuristic engine. If you use the hosted AI backend, relevant event-planning fields are sent to Google Gemini to generate the plan.</p>
         </div>
 
         <div class="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 space-y-1">
@@ -1324,6 +1327,8 @@
   <div id="toastContainer"></div>
 
   <!-- APPLICATION JAVASCRIPT MODULES -->
+  <script src="event-utils.js"></script>
+  <script src="config.js"></script>
   <script src="demo-data.js"></script>
   <script src="confidence-engine.js"></script>
   <script src="ai-engine.js"></script>

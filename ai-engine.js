@@ -9,215 +9,98 @@ const AIEngine = {
   activeMode: "intelligent-heuristic", // "gemini-live" or "intelligent-heuristic"
   lastError: null,
 
-  getApiKey() {
-    if (typeof localStorage !== "undefined") {
-      return localStorage.getItem("festiva_gemini_api_key") || "";
-    }
-    return process.env.GEMINI_API_KEY || "";
-  },
-
-  setApiKey(key) {
-    if (typeof localStorage !== "undefined") {
-      if (key && key.trim()) {
-        localStorage.setItem("festiva_gemini_api_key", key.trim());
-      } else {
-        localStorage.removeItem("festiva_gemini_api_key");
-      }
-    }
-  },
-
   /**
-   * Main generation method.
-   * Attempts Gemini API first (if key provided or backend proxy available),
-   * falling back to the intelligent deterministic engine with transparent reporting.
+   * Try the same-origin server proxy. The browser never reads, stores, or sends
+   * a Gemini secret. Static GitHub Pages deployments fall back cleanly.
    */
   async generateEventPlan(formData, onProgress) {
     if (onProgress) onProgress("Analyzing celebration parameters and priorities...", 20);
 
-    const apiKey = this.getApiKey();
+    const requestData = {
+      type: formData.type,
+      name: formData.name || "",
+      description: formData.description || "",
+      date: formData.date,
+      location: formData.location || "",
+      guests: Number(formData.guests),
+      budget: Number(formData.budget),
+      currency: formData.currency || "USD",
+      style: formData.style || "Elegant",
+      theme: formData.theme || "",
+      venuePreference: formData.venuePreference || "",
+      cateringPreference: formData.cateringPreference || "",
+      dietaryRestrictions: formData.dietaryRestrictions || "",
+      culturalTraditions: formData.culturalTraditions || "",
+      planningPriorities: formData.planningPriorities || "",
+      conditionalDetails: formData.conditionalDetails && typeof formData.conditionalDetails === "object"
+        ? formData.conditionalDetails : {}
+    };
 
-    // 1. Check if backend proxy or client-side Gemini key is present
-    if (apiKey) {
-      try {
-        if (onProgress) onProgress("Connecting to Google Gemini Generative AI...", 40);
-        const liveResult = await this.callGeminiApi(formData, apiKey, onProgress);
-        this.activeMode = "gemini-live";
-        return liveResult;
-      } catch (err) {
-        console.warn("Gemini API call failed, activating Intelligent Heuristic Engine:", err);
-        this.lastError = err.message || "Gemini API unavailable";
-      }
-    }
-
-    // Try backend proxy if available on localhost:3000
     try {
-      if (onProgress) onProgress("Checking server AI connection...", 50);
-      const res = await fetch("/api/generate-plan", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData)
-      });
-      if (res.ok) {
-        const data = await res.json();
-        if (data && data.concepts && data.budgetItems) {
-          this.activeMode = "gemini-live";
-          return data;
+      if (onProgress) onProgress("Checking secure Gemini service...", 45);
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 35000);
+      const apiBase = String((typeof window !== "undefined" && window.FESTIVA_API_BASE_URL) || "").replace(/\/$/, "");
+      let response;
+      try {
+        // Probe the backend without user event details first. Static hosting (including
+        // GitHub Pages) must not receive a POST containing the user's planning data.
+        const healthResponse = await fetch(`${apiBase}/api/health`, {
+          method: "GET",
+          headers: { "Accept": "application/json" },
+          cache: "no-store",
+          signal: controller.signal,
+          credentials: "same-origin"
+        });
+        const healthType = healthResponse.headers.get("content-type") || "";
+        if (!healthResponse.ok || !healthType.includes("application/json")) {
+          throw new Error("Secure Gemini backend is not configured; using the local planning engine.");
         }
+        const health = await healthResponse.json();
+        if (!health || health.status !== "ok" || health.aiAvailable !== true) {
+          throw new Error("Secure Gemini backend is not configured; using the local planning engine.");
+        }
+        response = await fetch(`${apiBase}/api/generate-plan`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "Accept": "application/json" },
+          body: JSON.stringify(requestData),
+          signal: controller.signal,
+          credentials: "same-origin"
+        });
+      } finally {
+        clearTimeout(timeout);
       }
-    } catch (e) {
-      // Backend not running or not responding to API, continue to fallback
-    }
 
-    // 2. Intelligent Heuristic Engine (Deterministic & Hyper-personalized)
-    if (onProgress) onProgress("Synthesizing concepts, budget allocations & timeline...", 75);
-    await new Promise(r => setTimeout(r, 650)); // smooth visual feedback
-
-    this.activeMode = "intelligent-heuristic";
-    const result = this.synthesizeTailoredPlan(formData);
-    if (onProgress) onProgress("Polishing vendor checklist and creative ideas...", 100);
-    return result;
-  },
-
-  /**
-   * Direct Google Gemini API caller
-   */
-  async callGeminiApi(formData, apiKey, onProgress) {
-    const prompt = this.buildGeminiPrompt(formData);
-    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-
-    const response = await fetch(endpoint, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: {
-          temperature: 0.7,
-          responseMimeType: "application/json"
+      const contentType = response.headers.get("content-type") || "";
+      if (response.ok && contentType.includes("application/json")) {
+        const data = await response.json();
+        if (Array.isArray(data.concepts) && data.concepts.length > 0 &&
+            Array.isArray(data.budgetItems) && data.budgetItems.length > 0 &&
+            Array.isArray(data.tasks) && Array.isArray(data.vendors)) {
+          this.activeMode = "gemini-live";
+          this.lastError = null;
+          if (onProgress) onProgress("Validating generated plan and budget...", 80);
+          return this.normalizeAndValidatePlan(data, requestData);
         }
-      })
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Gemini API error ${response.status}: ${errorText}`);
+        throw new Error("The AI service returned an incomplete plan.");
+      }
+      const responseMessage = contentType.includes("application/json")
+        ? (await response.json().catch(() => ({}))).error
+        : "Secure Gemini backend is not configured or is unavailable.";
+      throw new Error(responseMessage || `AI service returned HTTP ${response.status}.`);
+    } catch (err) {
+      this.lastError = err && err.name === "AbortError"
+        ? "AI service timed out. Used the local planning engine instead."
+        : (err?.message || "Secure Gemini backend unavailable.");
+      // Expected on static GitHub Pages: keep the core planning workflow usable.
     }
 
-    const data = await response.json();
-    const candidateText = data.candidates?.[0]?.content?.parts?.[0]?.text;
-    if (!candidateText) throw new Error("Empty response from Gemini API");
-
-    const parsed = JSON.parse(candidateText);
-    return this.normalizeAndValidatePlan(parsed, formData);
-  },
-
-  buildGeminiPrompt(data) {
-    return `You are Festiva AI, an elite event planner and celebration architect.
-Generate a comprehensive, mathematically consistent, tailored event plan JSON based on the following input:
-
-Event Type: ${data.type}
-Event Name: ${data.name || 'Grand Celebration'}
-Event Description: ${data.description || 'Special celebration'}
-Date: ${data.date}
-Location: ${data.location || 'Local Venue'}
-Guests: ${data.guests}
-Total Budget: ${data.budget} ${data.currency}
-Style: ${data.style}
-Theme/Palette: ${data.theme || 'Natural elegance'}
-Venue Preference: ${data.venuePreference}
-Catering Preference: ${data.cateringPreference}
-Dietary & Accessibility: ${data.dietaryRestrictions || 'None'}
-Cultural Traditions: ${data.culturalTraditions || 'None'}
-Planning Priorities: ${data.planningPriorities}
-Conditional Details: ${JSON.stringify(data.conditionalDetails || {})}
-
-Return a valid JSON object strictly matching this schema:
-{
-  "concepts": [
-    {
-      "id": "concept-1",
-      "name": "Theme Title",
-      "tagline": "Short evocative subtitle",
-      "isRecommended": true,
-      "description": "Rich 2-3 sentence concept overview",
-      "colorPalette": ["#hex1", "#hex2", "#hex3", "#hex4", "#hex5"],
-      "paletteNames": ["Name 1", "Name 2", "Name 3", "Name 4", "Name 5"],
-      "decorStyle": "Specific decor recommendations",
-      "lighting": "Lighting scheme and ambience",
-      "venueStyling": "Layout and spatial architecture",
-      "foodAndDrink": "Menu concepts and signature drinks",
-      "entertainment": "Music and performance touches",
-      "guestExperience": "Memorable touchpoints for attendees"
-    }
-    // exactly 3 concepts, one marked isRecommended: true matching user priorities
-  ],
-  "budgetItems": [
-    {
-      "id": "b1",
-      "category": "Venue & Site",
-      "allocated": 10000,
-      "estimated": 9800,
-      "actual": 0,
-      "status": "pending",
-      "vendor": "Target Venue",
-      "notes": "Allocation details"
-    }
-    // Must include 7-9 categories including Contingency Reserve. The sum of allocated MUST EQUAL ${data.budget}
-  ],
-  "tasks": [
-    {
-      "id": "t1",
-      "title": "Task title",
-      "category": "Category",
-      "deadline": "YYYY-MM-DD",
-      "status": "pending",
-      "priority": "High" | "Medium" | "Low",
-      "owner": "Host" | "Planner" | "VIP",
-      "notes": "Contextual tip"
-    }
-    // 12 to 16 chronological tasks relative to the event date ${data.date}
-  ],
-  "vendors": [
-    {
-      "id": "v1",
-      "name": "Recommended Vendor Role / Placeholder",
-      "category": "Service Category",
-      "service": "Scope of service",
-      "estimatedCost": 2500,
-      "actualCost": 0,
-      "depositPaid": 0,
-      "balanceDue": 2500,
-      "status": "Inquiry",
-      "contactPerson": "TBD",
-      "contactPhone": "",
-      "contactEmail": "",
-      "isVerified": false,
-      "notes": "Target benchmark based on regional rates"
-    }
-  ],
-  "ideas": [
-    {
-      "id": "i1",
-      "category": "Decor" | "Catering" | "Favors" | "Entertainment" | "Photography" | "Guest Experience",
-      "title": "Creative concept title",
-      "description": "Detailed idea description",
-      "whyItFits": "Why this aligns with user style and priorities",
-      "tiers": {
-        "affordable": "Budget-friendly option description with estimated cost",
-        "balanced": "Optimal value mid-range option",
-        "premium": "Elevated luxury option"
-      },
-      "tag": "Signature Touch"
-    }
-  ],
-  "surpriseIdeas": [
-    {
-      "title": "Unexpected delight",
-      "description": "Unique surprise touchpoint",
-      "category": "Surprise Twist",
-      "estimatedCost": "Approx price"
-    }
-  ]
-}`;
+    if (onProgress) onProgress("Synthesizing your plan with the built-in planning engine...", 75);
+    await new Promise(resolve => setTimeout(resolve, 250));
+    this.activeMode = "intelligent-heuristic";
+    const result = this.synthesizeTailoredPlan(requestData);
+    if (onProgress) onProgress("Finalizing budget, vendors, and timeline...", 100);
+    return result;
   },
 
   normalizeAndValidatePlan(parsed, formData) {
@@ -226,22 +109,27 @@ Return a valid JSON object strictly matching this schema:
     const currencySymbol = this.getCurrencySymbol(currency);
 
     // Validate budget math
-    let budgetItems = parsed.budgetItems || [];
-    let allocatedSum = budgetItems.reduce((acc, item) => acc + (Number(item.allocated) || 0), 0);
+    let budgetItems = Array.isArray(parsed.budgetItems)
+      ? parsed.budgetItems.filter(item => item && typeof item === "object" && !Array.isArray(item))
+      : [];
+    let allocatedSum = budgetItems.reduce((acc, item) => acc + EventUtils.numeric(item.allocated), 0);
     
     // Auto-normalize if sum differs from user budget
     if (allocatedSum !== budget && budgetItems.length > 0) {
-      const ratio = budget / allocatedSum;
       let newSum = 0;
+      const hasValidAllocation = allocatedSum > 0 && Number.isFinite(allocatedSum);
       budgetItems.forEach((item, idx) => {
         if (idx === budgetItems.length - 1) {
-          item.allocated = budget - newSum;
+          item.allocated = Math.max(0, budget - newSum);
         } else {
-          item.allocated = Math.round(item.allocated * ratio);
+          const original = EventUtils.numeric(item.allocated);
+          item.allocated = hasValidAllocation
+            ? Math.max(0, Math.round(original * budget / allocatedSum))
+            : Math.floor(budget / budgetItems.length);
           newSum += item.allocated;
         }
-        item.estimated = item.allocated;
-        item.actual = item.actual || 0;
+        item.estimated = Number.isFinite(Number(item.estimated)) && Number(item.estimated) >= 0 ? Number(item.estimated) : item.allocated;
+        item.actual = Number.isFinite(Number(item.actual)) ? Math.max(0, Number(item.actual)) : 0;
       });
     }
 
@@ -266,12 +154,16 @@ Return a valid JSON object strictly matching this schema:
       planningPriorities: formData.planningPriorities || "Guest Experience & Budget",
       conditionalDetails: formData.conditionalDetails || {},
       activeConceptId: parsed.concepts?.[0]?.id || "concept-1",
-      concepts: parsed.concepts || [],
+      concepts: Array.isArray(parsed.concepts) ? parsed.concepts.filter(item => item && typeof item === "object") : [],
       budgetItems: budgetItems,
-      tasks: parsed.tasks || [],
-      vendors: parsed.vendors || [],
-      ideas: parsed.ideas || [],
-      surpriseIdeas: parsed.surpriseIdeas || [],
+      tasks: Array.isArray(parsed.tasks) ? parsed.tasks.filter(item => item && typeof item === "object") : [],
+      vendors: Array.isArray(parsed.vendors)
+        ? parsed.vendors.filter(item => item && typeof item === "object").map(item => ({
+            ...item, isVerified: false, contactPerson: "", contactPhone: "", contactEmail: ""
+          }))
+        : [],
+      ideas: Array.isArray(parsed.ideas) ? parsed.ideas.filter(item => item && typeof item === "object") : [],
+      surpriseIdeas: Array.isArray(parsed.surpriseIdeas) ? parsed.surpriseIdeas.filter(item => item && typeof item === "object") : [],
       guestsList: []
     };
   },
@@ -609,11 +501,11 @@ Return a valid JSON object strictly matching this schema:
         depositPaid: 0,
         balanceDue: cost,
         status: i === 0 ? "Shortlisted" : "Inquiry",
-        contactPerson: "Recommended Inquiry",
+        contactPerson: "",
         contactPhone: "",
         contactEmail: "",
         isVerified: false,
-        notes: "Benchmark estimate based on your allocated budget category."
+        notes: "Illustrative cost benchmark only; no real vendor or contact has been verified."
       };
     });
   },
@@ -759,9 +651,10 @@ Return a valid JSON object strictly matching this schema:
   },
 
   getDefaultFutureDate(monthsAhead) {
+    if (typeof EventUtils !== "undefined") return EventUtils.addMonthsDateOnly(monthsAhead);
     const d = new Date();
     d.setMonth(d.getMonth() + monthsAhead);
-    return d.toISOString().split("T")[0];
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
   }
 };
 

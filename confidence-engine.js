@@ -9,14 +9,14 @@ const ConfidenceEngine = {
     if (!event) return this.getDefaultScore();
 
     // 1. Task Completion (35 Points Max)
-    const tasks = event.tasks || [];
+    const tasks = Array.isArray(event.tasks) ? event.tasks.filter(item => item && typeof item === "object") : [];
     const totalTasks = tasks.length;
     const completedTasks = tasks.filter(t => t.status === "completed").length;
     const taskCompletionRate = totalTasks > 0 ? (completedTasks / totalTasks) : 0;
     const taskScore = Math.round(taskCompletionRate * 35);
 
     // 2. Vendor Health & Booking Status (30 Points Max)
-    const vendors = event.vendors || [];
+    const vendors = Array.isArray(event.vendors) ? event.vendors.filter(item => item && typeof item === "object") : [];
     const totalVendors = vendors.length;
     let vendorWeightedPoints = 0;
     
@@ -45,11 +45,11 @@ const ConfidenceEngine = {
       : 15; // default neutral if no vendors entered yet
 
     // 3. Budget Health (20 Points Max)
-    const totalBudget = Number(event.budget) || 1;
-    const budgetItems = event.budgetItems || [];
-    const totalAllocated = budgetItems.reduce((sum, item) => sum + (Number(item.allocated) || 0), 0);
-    const totalActual = budgetItems.reduce((sum, item) => sum + (Number(item.actual) || 0), 0);
-    const totalEstimated = budgetItems.reduce((sum, item) => sum + (Number(item.estimated) || 0), 0);
+    const totalBudget = Math.max(1, EventUtils.numeric(event.budget));
+    const budgetItems = Array.isArray(event.budgetItems) ? event.budgetItems.filter(item => item && typeof item === "object") : [];
+    const totalAllocated = budgetItems.reduce((sum, item) => sum + EventUtils.numeric(item.allocated), 0);
+    const totalActual = budgetItems.reduce((sum, item) => sum + EventUtils.numeric(item.actual), 0);
+    const totalEstimated = budgetItems.reduce((sum, item) => sum + EventUtils.numeric(item.estimated), 0);
 
     const budgetUtilization = Math.round((totalActual / totalBudget) * 100);
     const plannedUtilization = Math.round((totalEstimated / totalBudget) * 100);
@@ -66,7 +66,7 @@ const ConfidenceEngine = {
     }
 
     // 4. Timeline & Deadline Health (15 Points Max)
-    const today = new Date().toISOString().split("T")[0];
+    const today = EventUtils.todayLocalDate();
     const overdueTasks = tasks.filter(t => t.status !== "completed" && t.deadline && t.deadline < today);
     const highPriorityOutstanding = tasks.filter(t => t.status !== "completed" && t.priority === "High");
 

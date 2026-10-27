@@ -1,11 +1,13 @@
 {
   "name": "festiva-ai",
   "version": "1.0.0",
-  "description": "Festiva AI — The Smart Celebration & Event Planner",
+  "description": "Festiva AI \u2014 The Smart Celebration & Event Planner",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "node server.js"
+    "dev": "node server.js",
+    "test": "node --test tests-event-utils.test.js",
+    "check": "node --check event-utils.js && node --check server-utils.js && node --check demo-data.js && node --check confidence-engine.js && node --check ai-engine.js && node --check app.js && node --check server.js"
   },
   "keywords": [
     "event-planner",
@@ -19,5 +21,8 @@
   "license": "MIT",
   "dependencies": {
     "express": "^4.22.3"
+  },
+  "engines": {
+    "node": ">=20"
   }
 }

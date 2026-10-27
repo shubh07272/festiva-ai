@@ -349,6 +349,36 @@ const DEMO_EVENT = {
   ]
 };
 
+// Keep the demo useful as time moves forward: place it 90 days ahead and shift
+// its sample milestones by the same number of calendar days. User-created events
+// saved in localStorage are never shifted.
+(function refreshDemoDates() {
+  const target = new Date();
+  target.setHours(0, 0, 0, 0);
+  target.setDate(target.getDate() + 90);
+  const newEventDate = `${target.getFullYear()}-${String(target.getMonth() + 1).padStart(2, "0")}-${String(target.getDate()).padStart(2, "0")}`;
+  const originalMs = Date.UTC(2027, 5, 20);
+  const newMs = Date.UTC(target.getFullYear(), target.getMonth(), target.getDate());
+  const shiftDays = Math.round((newMs - originalMs) / (24 * 60 * 60 * 1000));
+  DEMO_EVENT.date = newEventDate;
+  DEMO_EVENT.tasks = DEMO_EVENT.tasks.map(task => {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(task.deadline || "")) return task;
+    const [year, month, day] = task.deadline.split("-").map(Number);
+    const shifted = new Date(Date.UTC(year, month - 1, day) + shiftDays * 24 * 60 * 60 * 1000);
+    return { ...task, deadline: `${shifted.getUTCFullYear()}-${String(shifted.getUTCMonth() + 1).padStart(2, "0")}-${String(shifted.getUTCDate()).padStart(2, "0")}` };
+  });
+  // The demo vendor directory is illustrative only. Remove realistic-looking
+  // contact data and never label these records as independently verified.
+  DEMO_EVENT.vendors = DEMO_EVENT.vendors.map(vendor => ({
+    ...vendor,
+    contactPerson: "",
+    contactPhone: "",
+    contactEmail: "",
+    isVerified: false,
+    notes: `${vendor.notes || ""} Sample demo entry only; verify real vendor identity, contact details, and availability independently.`.trim()
+  }));
+})();
+
 // Available event types and default styling templates
 const EVENT_TEMPLATES = {
   Wedding: {
